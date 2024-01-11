@@ -7,20 +7,21 @@ GPIO.setup(18, GPIO.OUT)
 GPIO.setwarnings(False)
 GPIO.output(16, True)
 
-#iemand anders 500
-p = GPIO.PWM(16, 5000)
+
+
 
 def SpinMotor(direction, num_steps):
+	p = GPIO.PWM(16, 2000)
 	num_steps = int(num_steps);
-	p.ChangeFrequency(5000)
-	print("number of steps")
-	print(num_steps)
+#	p.ChangeFrequency(500)
+#	print("number of steps")
+#	print(num_steps)
 	GPIO.output(18, direction)
 	while num_steps > 0:
-		print("number of steps")
-		print(num_steps)
+		#print("number of steps")
+		#print(num_steps)
 		p.start(1)
-		time.sleep(0.03)
+		time.sleep(0.001)
 		num_steps -= 1
 	p.stop()
 	GPIO.cleanup()
