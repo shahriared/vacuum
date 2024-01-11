@@ -27,8 +27,10 @@ def SpinMotor(direction, num_steps):
 	GPIO.cleanup()
 	return True
 
+num_steps=9
 direction_input = input('Direction (L or R):')
-num_steps = input('Please enter the number of steps: ')
+degree = input('Degree: ')
+num_steps = degree * num_steps
 if direction_input == 'L':
     SpinMotor(True, num_steps)
 else:
