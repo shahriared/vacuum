@@ -21,7 +21,7 @@ def SpinMotor(direction, num_steps):
 		#print("number of steps")
 		#print(num_steps)
 		p.start(1)
-		# time.sleep(0.001)
+		time.sleep(0.0005)
 		num_steps -= 1
 	p.stop()
 	GPIO.cleanup()
