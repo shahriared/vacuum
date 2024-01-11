@@ -11,7 +11,7 @@ GPIO.output(16, True)
 
 
 def SpinMotor(direction, num_steps):
-	p = GPIO.PWM(16, 2000)
+	p = GPIO.PWM(16, 500)
 	num_steps = int(num_steps);
 #	p.ChangeFrequency(500)
 #	print("number of steps")
