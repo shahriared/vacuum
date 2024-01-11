@@ -8,10 +8,10 @@ GPIO.setwarnings(False)
 GPIO.output(16, True)
 
 #iemand anders 500
-p = GPIO.PWM(16, 5000)
+p = GPIO.PWM(16, 500)
 
 def SpinMotor(direction, num_steps):
-    p.ChangeFrequency(5050000)
+    p.ChangeFrequency(500)
     GPIO.output(18, direction)
     num_steps = int(num_steps)
     while num_steps > 0:
