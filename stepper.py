@@ -27,7 +27,7 @@ def SpinMotor(direction, num_steps):
 	GPIO.cleanup()
 	return True
 
-num_steps=8.95
+num_steps=9
 direction_input = input('Direction (L or R):')
 degree = input('Degree: ')
 num_steps = int(degree) * int(num_steps)
