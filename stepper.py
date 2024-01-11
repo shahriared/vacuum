@@ -30,8 +30,8 @@ def SpinMotor(direction, num_steps):
 direction_input = input('Direction (L or R):')
 num_steps = input('Please enter the number of steps: ')
 if direction_input == 'L':
-    SpinMotor(False, num_steps)
-else:
     SpinMotor(True, num_steps)
+else:
+    SpinMotor(False, num_steps)
 
 
