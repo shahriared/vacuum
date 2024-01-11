@@ -13,6 +13,7 @@ p = GPIO.PWM(16, 5000)
 def SpinMotor(direction, num_steps):
     p.ChangeFrequency(5000)
     GPIO.output(18, direction)
+    num_steps = int(num_steps)
     while num_steps > 0:
         p.start(1)
         time.sleep(0.01)
@@ -21,7 +22,7 @@ def SpinMotor(direction, num_steps):
     GPIO.cleanup()
     return True
 
-direction_input = raw_input('Please enter O or C fro Open or Close:')
+direction_input = input('Please enter O or C fro Open or Close:')
 num_steps = input('Please enter the number of steps: ')
 if direction_input == 'C':
     SpinMotor(False, num_steps)
