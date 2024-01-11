@@ -11,7 +11,7 @@ GPIO.output(16, True)
 
 def SpinMotor(direction, num_steps):
     p = GPIO.PWM(16, 1000)  # Set the PWM frequency to 1000 Hz
-    num_steps = int(num_steps)
+    num_steps = float(num_steps)
     GPIO.output(18, direction)
     p.start(50)  # Start PWM with a duty cycle of 50
     while num_steps > 0:
@@ -24,7 +24,7 @@ def SpinMotor(direction, num_steps):
 num_steps = 8
 direction_input = input('Direction (L or R):')
 degree = input('Degree: ')
-num_steps = int(degree) * int(num_steps)
+num_steps = float(degree) * float(num_steps)
 
 if direction_input == 'L':
     SpinMotor(True, num_steps)
