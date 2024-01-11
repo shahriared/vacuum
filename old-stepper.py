@@ -24,7 +24,7 @@ def SpinMotor(direction, num_steps):
 
 direction_input = input('Left or Right (L/R):')
 degree = input('Degree: ')
-num_steps = 339.5
+num_steps = 339.5/360
 num_steps = float(degree) * num_steps
 if direction_input == 'L':
     SpinMotor(True, num_steps)
