@@ -27,9 +27,11 @@ def SpinMotor(direction, num_steps):
 	GPIO.cleanup()
 	return True
 
-direction_input = input('Please enter O or C fro Open or Close:')
+direction_input = input('Direction (L or R):')
 num_steps = input('Please enter the number of steps: ')
-if direction_input == 'C':
+if direction_input == 'L':
     SpinMotor(False, num_steps)
 else:
     SpinMotor(True, num_steps)
+
+
