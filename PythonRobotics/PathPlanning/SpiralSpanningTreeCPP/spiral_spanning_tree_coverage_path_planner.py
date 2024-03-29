@@ -347,6 +347,7 @@ def main():
     #loop through directions
     num_steps = (339.5 / 360) * 90
     for direction in directions:
+        print('Ongoing direction:', direction)
         if direction == 'N':
             spin_motor(True, num_steps, 1)
             # spin_motor(True, num_steps, 2)
