@@ -11,8 +11,7 @@ import RPi.GPIO as GPIO
 # Constants
 MOTOR_PIN = 16
 DIRECTION_PIN = 18
-# PWM_FREQUENCY = 500
-PWM_FREQUENCY = 100
+PWM_FREQUENCY = 500
 
 do_animation = False
 
@@ -346,13 +345,12 @@ def main():
     print('directions:', directions)
 
     #loop through directions
-    num_steps = (339.5 / 360) * 20
+    num_steps = (339.5 / 360) * 10
     oldDirection = directions[0]
     for direction in directions:
         print('Ongoing direction:', direction)
         if direction == 'N':
             spin_motor(True, num_steps, 1)
-            # spin_motor(True, num_steps, 1)
             # spin_motor(True, num_steps, 2)
         elif direction == 'S':
             spin_motor(True, num_steps, 1)
