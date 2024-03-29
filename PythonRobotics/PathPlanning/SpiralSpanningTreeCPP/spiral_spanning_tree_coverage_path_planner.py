@@ -14,10 +14,14 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-do_animation = True
+do_animation = False
 
 
 class SpiralSpanningTreeCoveragePlanner:
+
+    # directions array
+    directions = []
+
     def __init__(self, occ_map):
         self.origin_map_height = occ_map.shape[0]
         self.origin_map_width = occ_map.shape[1]
@@ -68,7 +72,7 @@ class SpiralSpanningTreeCoveragePlanner:
             else:
                 sys.exit('adjacent path node distance larger than 2')
 
-        return self.edge, route, path
+        return self.edge, route, path, self.directions
 
     def perform_spanning_tree_coverage(self, current_node, visit_times, route):
         """perform_spanning_tree_coverage
@@ -131,6 +135,7 @@ class SpiralSpanningTreeCoveragePlanner:
 
     def move(self, p, q):
         direction = self.get_vector_direction(p, q)
+        self.directions.append(direction)
         print('move direction:', direction)
         print('p:', p)
         # move east
@@ -307,12 +312,14 @@ def main():
     img = plt.imread(os.path.join(dir_path, 'map', 'test_8.png'))
     STC_planner = SpiralSpanningTreeCoveragePlanner(img)
     start = (10, 0)
-    edge, route, path = STC_planner.plan(start)
+    edge, route, path, directions = STC_planner.plan(start)
     # print('start:', start)
     # print('edge:', edge)
     # print('route:', route)
     # print('path:', path)
-    STC_planner.visualize_path(edge, path, start)
+    # STC_planner.visualize_path(edge, path, start)
+
+    print('directions:', directions)
 
 
 if __name__ == "__main__":
