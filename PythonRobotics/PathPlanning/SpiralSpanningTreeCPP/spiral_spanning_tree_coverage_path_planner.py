@@ -349,16 +349,16 @@ def main():
     for direction in directions:
         if direction == 'N':
             spin_motor(True, num_steps, 1)
-            spin_motor(True, num_steps, 2)
+            # spin_motor(True, num_steps, 2)
         elif direction == 'S':
             spin_motor(True, num_steps, 1)
-            spin_motor(False, num_steps, 2)
+            # spin_motor(False, num_steps, 2)
         elif direction == 'E':
             spin_motor(True, num_steps, 1)
-            spin_motor(False, num_steps, 2)
+            # spin_motor(False, num_steps, 2)
         elif direction == 'W':
             spin_motor(False, num_steps, 1)
-            spin_motor(True, num_steps, 2)
+            # spin_motor(True, num_steps, 2)
 
     # direction_input = get_user_input('Left or Right (L/R): ')
     # degree = float(input('Degree: '))
