@@ -380,7 +380,7 @@ def main():
     
     setup_gpio()
 
-    while 1:
+    # while 1:
         
 
         # GPIO.output(MOTOR_1_PIN_1, True)
