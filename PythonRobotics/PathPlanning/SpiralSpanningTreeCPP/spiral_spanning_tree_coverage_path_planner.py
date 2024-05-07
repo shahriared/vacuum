@@ -9,10 +9,10 @@ import time
 import RPi.GPIO as GPIO
 
 # Constants
-MOTOR_1_PIN_1 = 16
-MOTOR_1_PIN_2 = 16
+MOTOR_1_PIN_1 = 11
+MOTOR_1_PIN_2 = 13
 MOTOR_2_PIN_1 = 16
-MOTOR_2_PIN_2 = 16
+MOTOR_2_PIN_2 = 18
 DIRECTION_PIN = 18
 PWM_FREQUENCY = 500
 
@@ -318,7 +318,7 @@ def setup_gpio():
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
     return 
 
-def spin_motor(direction, num_steps, motor_num=1):
+def spin_motor():
     setup_gpio()
     
     GPIO.output(MOTOR_1_PIN_1, True)
