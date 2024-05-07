@@ -392,11 +392,11 @@ def main():
         # #GPIO.cleanup()
         # time.sleep(2.2)
 
-        GPIO.output(MOTOR_1_PIN_1, False)
-        GPIO.output(MOTOR_1_PIN_2, False)
+        # GPIO.output(MOTOR_1_PIN_1, False)
+        # GPIO.output(MOTOR_1_PIN_2, False)
 
-        GPIO.output(MOTOR_2_PIN_1, False)
-        GPIO.output(MOTOR_2_PIN_2, False)
+        # GPIO.output(MOTOR_2_PIN_1, False)
+        # GPIO.output(MOTOR_2_PIN_2, False)
 
 
 if __name__ == "__main__":
