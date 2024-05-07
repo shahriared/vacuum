@@ -389,7 +389,7 @@ def main():
         GPIO.output(MOTOR_2_PIN_2, True)
         
         #GPIO.cleanup()
-        time.sleep(2)
+        time.sleep(2.2)
 
         GPIO.output(MOTOR_1_PIN_1, False)
         GPIO.output(MOTOR_1_PIN_2, False)
