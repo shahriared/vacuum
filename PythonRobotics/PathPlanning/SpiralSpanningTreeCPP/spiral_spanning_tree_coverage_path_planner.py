@@ -380,7 +380,7 @@ def main():
     
     setup_gpio()
 
-    while 1:
+    while True:
         
         GPIO.output(MOTOR_1_PIN_1, True)
         GPIO.output(MOTOR_1_PIN_2, False)
@@ -396,6 +396,8 @@ def main():
 
         GPIO.output(MOTOR_2_PIN_1, False)
         GPIO.output(MOTOR_2_PIN_2, False)
+
+        time.sleep(1)
 
 
 if __name__ == "__main__":
