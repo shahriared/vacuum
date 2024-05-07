@@ -2,6 +2,8 @@ import os
 import sys
 import math
 
+import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -375,8 +377,19 @@ def main():
     # # else:
     # #     spin_motor(False, num_steps)
 
-    spin_motor()
-    GPIO.cleanup()
+    
+
+    while 1:
+        setup_gpio()
+
+        GPIO.output(MOTOR_1_PIN_1, True)
+        GPIO.output(MOTOR_1_PIN_2, False)
+
+        GPIO.output(MOTOR_2_PIN_1, True)
+        GPIO.output(MOTOR_2_PIN_2, False)
+        
+        GPIO.cleanup()
+        time.sleep(2.2)
 
 
 if __name__ == "__main__":
