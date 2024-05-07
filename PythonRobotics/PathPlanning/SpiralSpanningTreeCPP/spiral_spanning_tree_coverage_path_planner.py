@@ -376,6 +376,7 @@ def main():
     # #     spin_motor(False, num_steps)
 
     spin_motor()
+    GPIO.cleanup()
 
 
 if __name__ == "__main__":
