@@ -9,7 +9,10 @@ import time
 import RPi.GPIO as GPIO
 
 # Constants
-MOTOR_PIN = 16
+MOTOR_1_PIN_1 = 16
+MOTOR_1_PIN_2 = 16
+MOTOR_2_PIN_1 = 16
+MOTOR_2_PIN_2 = 16
 DIRECTION_PIN = 18
 PWM_FREQUENCY = 500
 
@@ -307,21 +310,23 @@ class SpiralSpanningTreeCoveragePlanner:
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(MOTOR_PIN, GPIO.OUT)
-    GPIO.setup(DIRECTION_PIN, GPIO.OUT)
-    GPIO.output(MOTOR_PIN, True)
-    return GPIO.PWM(MOTOR_PIN, PWM_FREQUENCY)
+
+    GPIO.setup(MOTOR_1_PIN_1, GPIO.OUT)
+    GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
+
+    GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
+    GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
+    return 
 
 def spin_motor(direction, num_steps, motor_num=1):
-    p = setup_gpio()
-    p.ChangeFrequency(PWM_FREQUENCY)
-    GPIO.output(DIRECTION_PIN, direction)
-    num_steps = float(num_steps)
-    while num_steps > 0:
-        p.start(1)
-        time.sleep(0.01)
-        num_steps -= 1
-    p.stop()
+    setup_gpio()
+    
+    GPIO.output(MOTOR_1_PIN_1, True)
+    GPIO.output(MOTOR_1_PIN_2, False)
+
+    GPIO.output(MOTOR_2_PIN_1, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
+    return
 
 def get_user_input(prompt):
     while True:
@@ -331,44 +336,46 @@ def get_user_input(prompt):
         print("Invalid input. Please enter 'L' or 'R'.")
 
 def main():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    img = plt.imread(os.path.join(dir_path, 'map', 'test_8.png'))
-    STC_planner = SpiralSpanningTreeCoveragePlanner(img)
-    start = (10, 0)
-    edge, route, path, directions = STC_planner.plan(start)
-    # print('start:', start)
-    # print('edge:', edge)
-    # print('route:', route)
-    # print('path:', path)
-    # STC_planner.visualize_path(edge, path, start)
+    # dir_path = os.path.dirname(os.path.realpath(__file__))
+    # img = plt.imread(os.path.join(dir_path, 'map', 'test_8.png'))
+    # STC_planner = SpiralSpanningTreeCoveragePlanner(img)
+    # start = (10, 0)
+    # edge, route, path, directions = STC_planner.plan(start)
+    # # print('start:', start)
+    # # print('edge:', edge)
+    # # print('route:', route)
+    # # print('path:', path)
+    # # STC_planner.visualize_path(edge, path, start)
 
-    print('directions:', directions)
+    # print('directions:', directions)
 
-    #loop through directions
-    num_steps = (339.5 / 360) * 10
-    oldDirection = directions[0]
-    for direction in directions:
-        print('Ongoing direction:', direction)
-        if direction == 'N':
-            spin_motor(True, num_steps, 1)
-            # spin_motor(True, num_steps, 2)
-        elif direction == 'S':
-            spin_motor(True, num_steps, 1)
-            # spin_motor(False, num_steps, 2)
-        elif direction == 'E':
-            spin_motor(True, num_steps, 1)
-            # spin_motor(False, num_steps, 2)
-        elif direction == 'W':
-            spin_motor(False, num_steps, 1)
-            # spin_motor(True, num_steps, 2)
+    # #loop through directions
+    # num_steps = (339.5 / 360) * 10
+    # oldDirection = directions[0]
+    # for direction in directions:
+    #     print('Ongoing direction:', direction)
+    #     if direction == 'N':
+    #         spin_motor(True, num_steps, 1)
+    #         # spin_motor(True, num_steps, 2)
+    #     elif direction == 'S':
+    #         spin_motor(True, num_steps, 1)
+    #         # spin_motor(False, num_steps, 2)
+    #     elif direction == 'E':
+    #         spin_motor(True, num_steps, 1)
+    #         # spin_motor(False, num_steps, 2)
+    #     elif direction == 'W':
+    #         spin_motor(False, num_steps, 1)
+    #         # spin_motor(True, num_steps, 2)
 
-    # direction_input = get_user_input('Left or Right (L/R): ')
-    # degree = float(input('Degree: '))
-    # num_steps = (339.5 / 360) * degree
-    # if direction_input == 'L':
-    #     spin_motor(True, num_steps)
-    # else:
-    #     spin_motor(False, num_steps)
+    # # direction_input = get_user_input('Left or Right (L/R): ')
+    # # degree = float(input('Degree: '))
+    # # num_steps = (339.5 / 360) * degree
+    # # if direction_input == 'L':
+    # #     spin_motor(True, num_steps)
+    # # else:
+    # #     spin_motor(False, num_steps)
+
+    spin_motor()
     GPIO.cleanup()
 
 
