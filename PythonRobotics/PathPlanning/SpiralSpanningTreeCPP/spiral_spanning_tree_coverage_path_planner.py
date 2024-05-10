@@ -14,14 +14,26 @@ from gpiozero import DistanceSensor
 
 
 # Constants
-MOTOR_1_PIN_1 = 11
-MOTOR_1_PIN_2 = 13
-MOTOR_2_PIN_1 = 16
-MOTOR_2_PIN_2 = 18
-ULTRASONIC_TRIGGER= 5
-ULTRASONIC_ECHO = 3
-DIRECTION_PIN = 18
-PWM_FREQUENCY = 500
+MOTOR_1_PIN_1 = 11  # Left wheel
+MOTOR_1_PIN_2 = 13  # Left wheel
+MOTOR_2_PIN_1 = 16  # Right wheel
+MOTOR_2_PIN_2 = 18  # Right wheel
+
+# Ultrasonic sensors pins
+ULTRASONIC_FRONT_TRIGGER = 16
+ULTRASONIC_FRONT_ECHO = 18
+ULTRASONIC_RIGHT_TRIGGER = 23
+ULTRASONIC_RIGHT_ECHO = 21
+
+# Ultrasonic sensors pins
+# ULTRASONIC_TRIGGER = [16, 19, 21, 23]
+# ULTRASONIC_ECHO = [18, 22, 24, 26]
+
+# Threshold distance
+DISTANCE_THRESHOLD = 10  # in cm
+
+# Turning time for 90-degree rotation (in seconds)
+TURNING_TIME = 2.24
 
 do_animation = False
 
@@ -321,30 +333,48 @@ def setup_gpio():
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_TRIGGER, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_ECHO, GPIO.IN)
-    return
+    GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
+    GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
 
-def spin_motor(motor1_forward, motor2_forward):
-    GPIO.output(MOTOR_1_PIN_1, motor1_forward)
-    GPIO.output(MOTOR_1_PIN_2, not motor1_forward)
-    GPIO.output(MOTOR_2_PIN_1, motor2_forward)
-    GPIO.output(MOTOR_2_PIN_2, not motor2_forward)
-    return
+def move_forward():
+    GPIO.output(MOTOR_1_PIN_1, True)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
 
-def get_distance():
+def move_backward():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, True)
+    GPIO.output(MOTOR_2_PIN_1, False)
+    GPIO.output(MOTOR_2_PIN_2, True)
+
+def turn_left():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, True)
+    GPIO.output(MOTOR_2_PIN_1, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
+
+def turn_right():
+    GPIO.output(MOTOR_1_PIN_1, True)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, False)
+    GPIO.output(MOTOR_2_PIN_2, True)
+
+def get_distance(trigger_pin, echo_pin):
     # Send ultrasonic signal
-    GPIO.output(ULTRASONIC_TRIGGER, True)
+    GPIO.output(trigger_pin, True)
     time.sleep(0.00001)
-    GPIO.output(ULTRASONIC_TRIGGER, False)
+    GPIO.output(trigger_pin, False)
 
     # Wait for echo
     pulse_start = time.time()
     pulse_end = time.time()
-    while GPIO.input(ULTRASONIC_ECHO) == 0:
+    while GPIO.input(echo_pin) == 0:
         pulse_start = time.time()
 
-    while GPIO.input(ULTRASONIC_ECHO) == 1:
+    while GPIO.input(echo_pin) == 1:
         pulse_end = time.time()
 
     # Calculate distance
@@ -358,17 +388,32 @@ def main():
 
     try:
         while True:
-            distance = get_distance()
-            print("Distance:", distance, "cm")
+            # Check distance from the front ultrasonic sensor
+            distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            print("Distance from Front Sensor:", distance_front, "cm")
 
-            if distance > 10:
+            if distance_front > DISTANCE_THRESHOLD:
                 # Move forward
-                spin_motor(True, True)
+                move_forward()
             else:
-                # Stop
-                spin_motor(False, False)
-            
-            time.sleep(0.1)  # Adjust delay as needed
+                # Stop and turn right for 90 degrees
+                move_backward()
+                time.sleep(TURNING_TIME)
+                turn_right()  # Turn right
+
+                # Follow the wall using the right ultrasonic sensor
+                while True:
+                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+                    print("Distance from Right Sensor:", distance_right, "cm")
+
+                    if distance_right <= DISTANCE_THRESHOLD:
+                        # Move forward and maintain distance to the wall
+                        move_forward()
+                    else:
+                        # Turn right to adjust distance to the wall
+                        turn_right()
+
+                    time.sleep(0.1)  # Adjust delay as needed
 
     except KeyboardInterrupt:
         print("Exiting program...")
