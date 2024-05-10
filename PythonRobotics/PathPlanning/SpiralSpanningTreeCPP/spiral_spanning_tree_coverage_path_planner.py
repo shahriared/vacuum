@@ -74,46 +74,43 @@ def get_distance(trigger_pin, echo_pin):
     return distance
 
 def main():
-    GPIO.cleanup()
-    time.sleep(2)
     setup_gpio()
 
-    # try:
-    while True:
-        move_forward()
-
-        # Check distance from the front ultrasonic sensor
-        distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-        print("Distance from Front Sensor:", distance_front, "cm")
-
-        if distance_front > DISTANCE_THRESHOLD:
-            # Move forward
+    try:
+        while True:
             move_forward()
-        else:
-            # Stop and turn right for 90 degrees
-            move_backward()
-            time.sleep(TURNING_TIME)
-            turn_right()  # Turn right
 
-            # Follow the wall using the right ultrasonic sensor
-            while True:
-                distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-                print("Distance from Right Sensor:", distance_right, "cm")
+            # Check distance from the front ultrasonic sensor
+            distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            print("Distance from Front Sensor:", distance_front, "cm")
 
-                if distance_right <= DISTANCE_THRESHOLD:
-                    # Move forward and maintain distance to the wall
-                    move_forward()
-                else:
-                    # Turn right to adjust distance to the wall
-                    turn_right()
+            if distance_front > DISTANCE_THRESHOLD:
+                # Move forward
+                move_forward()
+            else:
+                # Stop and turn right for 90 degrees
+                move_backward()
+                time.sleep(TURNING_TIME)
+                turn_right()  # Turn right
 
-                time.sleep(0.1)  # Adjust delay as needed
+                # Follow the wall using the right ultrasonic sensor
+                while True:
+                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+                    print("Distance from Right Sensor:", distance_right, "cm")
 
-    # except KeyboardInterrupt:
-    #     print("Exiting program...")
-    # finally:
-    #     GPIO.cleanup()
-    # GPIO.cleanup()
+                    if distance_right <= DISTANCE_THRESHOLD:
+                        # Move forward and maintain distance to the wall
+                        move_forward()
+                    else:
+                        # Turn right to adjust distance to the wall
+                        turn_right()
+
+                    time.sleep(0.1)  # Adjust delay as needed
+
+    except KeyboardInterrupt:
+        print("Exiting program...")
+    finally:
+        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()
