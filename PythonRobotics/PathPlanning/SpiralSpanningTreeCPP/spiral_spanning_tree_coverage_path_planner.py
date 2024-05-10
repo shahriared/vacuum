@@ -2,10 +2,10 @@ import time
 import RPi.GPIO as GPIO
 
 # Constants
-MOTOR_1_PIN_1 = 11  # Left wheel
-MOTOR_1_PIN_2 = 13  # Left wheel
-MOTOR_2_PIN_1 = 16  # Right wheel
-MOTOR_2_PIN_2 = 18  # Right wheel
+MOTOR_1_PIN_1 = 11
+MOTOR_1_PIN_2 = 13
+MOTOR_2_PIN_1 = 16
+MOTOR_2_PIN_2 = 18
 
 # Ultrasonic sensors pins
 ULTRASONIC_FRONT_TRIGGER = 16
@@ -20,7 +20,7 @@ DISTANCE_THRESHOLD = 10  # in cm
 TURNING_TIME = 2.24
 
 def setup_gpio():
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(MOTOR_1_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
