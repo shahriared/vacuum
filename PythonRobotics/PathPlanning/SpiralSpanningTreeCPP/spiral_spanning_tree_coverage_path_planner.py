@@ -14,10 +14,10 @@ from gpiozero import DistanceSensor
 
 
 # Constants
-MOTOR_1_PIN_1 = 11
-MOTOR_1_PIN_2 = 13
-MOTOR_2_PIN_1 = 16
-MOTOR_2_PIN_2 = 18
+MOTOR_1_PIN_1 = 11  # Left wheel
+MOTOR_1_PIN_2 = 13  # Left wheel
+MOTOR_2_PIN_1 = 16  # Right wheel
+MOTOR_2_PIN_2 = 18  # Right wheel
 
 # Ultrasonic sensors pins
 ULTRASONIC_TRIGGER = [16, 23]
@@ -331,11 +331,29 @@ def setup_gpio():
         GPIO.setup(trigger_pin, GPIO.OUT)
         GPIO.setup(echo_pin, GPIO.IN)
 
-def spin_motor(motor1_forward, motor2_forward):
-    GPIO.output(MOTOR_1_PIN_1, motor1_forward)
-    GPIO.output(MOTOR_1_PIN_2, not motor1_forward)
-    GPIO.output(MOTOR_2_PIN_1, motor2_forward)
-    GPIO.output(MOTOR_2_PIN_2, not motor2_forward)
+def move_forward():
+    GPIO.output(MOTOR_1_PIN_1, True)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
+
+def move_backward():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, True)
+    GPIO.output(MOTOR_2_PIN_1, False)
+    GPIO.output(MOTOR_2_PIN_2, True)
+
+def turn_left():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, True)
+    GPIO.output(MOTOR_2_PIN_1, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
+
+def turn_right():
+    GPIO.output(MOTOR_1_PIN_1, True)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, False)
+    GPIO.output(MOTOR_2_PIN_2, True)
 
 def get_distance(trigger_pin, echo_pin):
     # Send ultrasonic signal
@@ -369,23 +387,24 @@ def main():
 
             if distance_1 > DISTANCE_THRESHOLD:
                 # Move forward
-                spin_motor(True, True)
+                move_forward()
             else:
                 # Stop and spin for 2.24 seconds
-                spin_motor(False, False)
+                move_backward()
                 time.sleep(2.24)
+                turn_left()  # Turn left
 
-                # Follow the wall using second ultrasonic sensor
+                # Follow the wall using the second ultrasonic sensor
                 while True:
                     distance_2 = get_distance(ULTRASONIC_TRIGGER[1], ULTRASONIC_ECHO[1])
                     print("Distance from Sensor 2:", distance_2, "cm")
 
                     if distance_2 <= DISTANCE_THRESHOLD:
                         # Move forward and maintain distance to the wall
-                        spin_motor(True, True)
+                        move_forward()
                     else:
-                        # Move towards the wall to reduce distance
-                        spin_motor(True, False)
+                        # Turn left to adjust distance to the wall
+                        turn_left()
 
                     time.sleep(0.1)  # Adjust delay as needed
 
