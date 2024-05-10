@@ -18,8 +18,8 @@ MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
 MOTOR_2_PIN_1 = 16
 MOTOR_2_PIN_2 = 18
-ULTRASONIC_1_TRIGGER= 5
-ULTRASONIC_1_ECHO = 3
+ULTRASONIC_TRIGGER= 5
+ULTRASONIC_ECHO = 3
 DIRECTION_PIN = 18
 PWM_FREQUENCY = 500
 
@@ -317,102 +317,63 @@ class SpiralSpanningTreeCoveragePlanner:
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
-
     GPIO.setup(MOTOR_1_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
-
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
-
-    GPIO.setup(ULTRASONIC_1_ECHO, GPIO.IN)
-    GPIO.setup(ULTRASONIC_1_TRIGGER, GPIO.OUT)
-    return 
-
-def spin_motor():
-    setup_gpio()
-    
-    GPIO.output(MOTOR_1_PIN_1, True)
-    GPIO.output(MOTOR_1_PIN_2, False)
-
-    GPIO.output(MOTOR_2_PIN_1, True)
-    GPIO.output(MOTOR_2_PIN_2, False)
-
+    GPIO.setup(ULTRASONIC_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_ECHO, GPIO.IN)
     return
 
-def get_user_input(prompt):
-    while True:
-        user_input = input(prompt).strip().upper()
-        if user_input in ['L', 'R']:
-            return user_input
-        print("Invalid input. Please enter 'L' or 'R'.")
+def spin_motor(motor1_forward, motor2_forward):
+    GPIO.output(MOTOR_1_PIN_1, motor1_forward)
+    GPIO.output(MOTOR_1_PIN_2, not motor1_forward)
+    GPIO.output(MOTOR_2_PIN_1, motor2_forward)
+    GPIO.output(MOTOR_2_PIN_2, not motor2_forward)
+    return
+
+def get_distance():
+    # Send ultrasonic signal
+    GPIO.output(ULTRASONIC_TRIGGER, True)
+    time.sleep(0.00001)
+    GPIO.output(ULTRASONIC_TRIGGER, False)
+
+    # Wait for echo
+    pulse_start = time.time()
+    pulse_end = time.time()
+    while GPIO.input(ULTRASONIC_ECHO) == 0:
+        pulse_start = time.time()
+
+    while GPIO.input(ULTRASONIC_ECHO) == 1:
+        pulse_end = time.time()
+
+    # Calculate distance
+    pulse_duration = pulse_end - pulse_start
+    distance = pulse_duration * 17150  # Speed of sound is 343m/s, but we're measuring round trip
+    distance = round(distance, 2)  # Round to 2 decimal places
+    return distance
 
 def main():
-    # dir_path = os.path.dirname(os.path.realpath(__file__))
-    # img = plt.imread(os.path.join(dir_path, 'map', 'test_8.png'))
-    # STC_planner = SpiralSpanningTreeCoveragePlanner(img)
-    # start = (10, 0)
-    # edge, route, path, directions = STC_planner.plan(start)
-    # # print('start:', start)
-    # # print('edge:', edge)
-    # # print('route:', route)
-    # # print('path:', path)
-    # # STC_planner.visualize_path(edge, path, start)
-
-    # print('directions:', directions)
-
-    # #loop through directions
-    # num_steps = (339.5 / 360) * 10
-    # oldDirection = directions[0]
-    # for direction in directions:
-    #     print('Ongoing direction:', direction)
-    #     if direction == 'N':
-    #         spin_motor(True, num_steps, 1)
-    #         # spin_motor(True, num_steps, 2)
-    #     elif direction == 'S':
-    #         spin_motor(True, num_steps, 1)
-    #         # spin_motor(False, num_steps, 2)
-    #     elif direction == 'E':
-    #         spin_motor(True, num_steps, 1)
-    #         # spin_motor(False, num_steps, 2)
-    #     elif direction == 'W':
-    #         spin_motor(False, num_steps, 1)
-    #         # spin_motor(True, num_steps, 2)
-
-    # # direction_input = get_user_input('Left or Right (L/R): ')
-    # # degree = float(input('Degree: '))
-    # # num_steps = (339.5 / 360) * degree
-    # # if direction_input == 'L':
-    # #     spin_motor(True, num_steps)
-    # # else:
-    # #     spin_motor(False, num_steps)
-
-    
     setup_gpio()
 
-    ultrasonic = DistanceSensor(echo=ULTRASONIC_1_ECHO, trigger=ULTRASONIC_1_TRIGGER)
+    try:
+        while True:
+            distance = get_distance()
+            print("Distance:", distance, "cm")
 
-    while True:
+            if distance > 10:
+                # Move forward
+                spin_motor(True, True)
+            else:
+                # Stop
+                spin_motor(False, False)
+            
+            time.sleep(0.1)  # Adjust delay as needed
 
-        print(ultrasonic.distance)
-        
-        
-        GPIO.output(MOTOR_1_PIN_1, True)
-        GPIO.output(MOTOR_1_PIN_2, False)
-
-        GPIO.output(MOTOR_2_PIN_1, False)
-        GPIO.output(MOTOR_2_PIN_2, True)
-        
-        #GPIO.cleanup()
-        time.sleep(2.24)
-
-        GPIO.output(MOTOR_1_PIN_1, False)
-        GPIO.output(MOTOR_1_PIN_2, False)
-
-        GPIO.output(MOTOR_2_PIN_1, False)
-        GPIO.output(MOTOR_2_PIN_2, False)
-
-        time.sleep(1)
-
+    except KeyboardInterrupt:
+        print("Exiting program...")
+    finally:
+        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()
