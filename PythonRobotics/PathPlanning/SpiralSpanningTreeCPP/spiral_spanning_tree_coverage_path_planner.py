@@ -18,6 +18,8 @@ MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
 MOTOR_2_PIN_1 = 16
 MOTOR_2_PIN_2 = 18
+ULTRASONIC_1_TRIGGER= 16
+ULTRASONIC_1_ECHO = 18
 DIRECTION_PIN = 18
 PWM_FREQUENCY = 500
 
@@ -321,6 +323,9 @@ def setup_gpio():
 
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
+
+    GPIO.setup(ULTRASONIC_1_ECHO, GPIO.IN)
+    GPIO.setup(ULTRASONIC_1_TRIGGER, GPIO.OUT)
     return 
 
 def spin_motor():
@@ -331,6 +336,7 @@ def spin_motor():
 
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
+
     return
 
 def get_user_input(prompt):
@@ -383,7 +389,7 @@ def main():
     
     setup_gpio()
 
-    ultrasonic = DistanceSensor(echo=3, trigger=5)
+    ultrasonic = DistanceSensor(echo=ULTRASONIC_1_ECHO, trigger=ULTRASONIC_1_TRIGGER)
 
     while True:
 
