@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import time
 import RPi.GPIO as GPIO
 
+from gpiozero import DistanceSensor
+
+
 # Constants
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
@@ -380,7 +383,12 @@ def main():
     
     setup_gpio()
 
+    ultrasonic = DistanceSensor(echo=3, trigger=5)
+
     while True:
+
+        print(ultrasonic.distance)
+        
         
         GPIO.output(MOTOR_1_PIN_1, True)
         GPIO.output(MOTOR_1_PIN_2, False)
