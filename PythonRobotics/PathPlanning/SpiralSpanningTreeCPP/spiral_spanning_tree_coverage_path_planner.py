@@ -20,7 +20,7 @@ DISTANCE_THRESHOLD = 10  # in cm
 TURNING_TIME = 2.24
 
 def setup_gpio():
-    GPIO.setmode(GPIO.BOARD)
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(MOTOR_1_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
