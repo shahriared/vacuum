@@ -14,19 +14,14 @@ from gpiozero import DistanceSensor
 
 
 # Constants
-MOTOR_1_PIN_1 = 11  # Left wheel
-MOTOR_1_PIN_2 = 13  # Left wheel
-MOTOR_2_PIN_1 = 16  # Right wheel
-MOTOR_2_PIN_2 = 18  # Right wheel
-
-# Ultrasonic sensors pins
-ULTRASONIC_TRIGGER = [16, 23]
-ULTRASONIC_ECHO = [18, 21]
-# ULTRASONIC_TRIGGER = [16, 19, 21, 23]
-# ULTRASONIC_ECHO = [18, 22, 24, 26]
-
-# Threshold distance
-DISTANCE_THRESHOLD = 10  # in cm
+MOTOR_1_PIN_1 = 11
+MOTOR_1_PIN_2 = 13
+MOTOR_2_PIN_1 = 16
+MOTOR_2_PIN_2 = 18
+ULTRASONIC_TRIGGER= 5
+ULTRASONIC_ECHO = 3
+DIRECTION_PIN = 18
+PWM_FREQUENCY = 500
 
 do_animation = False
 
@@ -326,48 +321,30 @@ def setup_gpio():
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_ECHO, GPIO.IN)
+    return
 
-    for trigger_pin, echo_pin in zip(ULTRASONIC_TRIGGER, ULTRASONIC_ECHO):
-        GPIO.setup(trigger_pin, GPIO.OUT)
-        GPIO.setup(echo_pin, GPIO.IN)
+def spin_motor(motor1_forward, motor2_forward):
+    GPIO.output(MOTOR_1_PIN_1, motor1_forward)
+    GPIO.output(MOTOR_1_PIN_2, not motor1_forward)
+    GPIO.output(MOTOR_2_PIN_1, motor2_forward)
+    GPIO.output(MOTOR_2_PIN_2, not motor2_forward)
+    return
 
-def move_forward():
-    GPIO.output(MOTOR_1_PIN_1, True)
-    GPIO.output(MOTOR_1_PIN_2, False)
-    GPIO.output(MOTOR_2_PIN_1, True)
-    GPIO.output(MOTOR_2_PIN_2, False)
-
-def move_backward():
-    GPIO.output(MOTOR_1_PIN_1, False)
-    GPIO.output(MOTOR_1_PIN_2, True)
-    GPIO.output(MOTOR_2_PIN_1, False)
-    GPIO.output(MOTOR_2_PIN_2, True)
-
-def turn_left():
-    GPIO.output(MOTOR_1_PIN_1, False)
-    GPIO.output(MOTOR_1_PIN_2, True)
-    GPIO.output(MOTOR_2_PIN_1, True)
-    GPIO.output(MOTOR_2_PIN_2, False)
-
-def turn_right():
-    GPIO.output(MOTOR_1_PIN_1, True)
-    GPIO.output(MOTOR_1_PIN_2, False)
-    GPIO.output(MOTOR_2_PIN_1, False)
-    GPIO.output(MOTOR_2_PIN_2, True)
-
-def get_distance(trigger_pin, echo_pin):
+def get_distance():
     # Send ultrasonic signal
-    GPIO.output(trigger_pin, True)
+    GPIO.output(ULTRASONIC_TRIGGER, True)
     time.sleep(0.00001)
-    GPIO.output(trigger_pin, False)
+    GPIO.output(ULTRASONIC_TRIGGER, False)
 
     # Wait for echo
     pulse_start = time.time()
     pulse_end = time.time()
-    while GPIO.input(echo_pin) == 0:
+    while GPIO.input(ULTRASONIC_ECHO) == 0:
         pulse_start = time.time()
 
-    while GPIO.input(echo_pin) == 1:
+    while GPIO.input(ULTRASONIC_ECHO) == 1:
         pulse_end = time.time()
 
     # Calculate distance
@@ -381,32 +358,17 @@ def main():
 
     try:
         while True:
-            # Check distance from the first ultrasonic sensor
-            distance_1 = get_distance(ULTRASONIC_TRIGGER[0], ULTRASONIC_ECHO[0])
-            print("Distance from Sensor 1:", distance_1, "cm")
+            distance = get_distance()
+            print("Distance:", distance, "cm")
 
-            if distance_1 > DISTANCE_THRESHOLD:
+            if distance > 10:
                 # Move forward
-                move_forward()
+                spin_motor(True, True)
             else:
-                # Stop and spin for 2.24 seconds
-                move_backward()
-                time.sleep(2.24)
-                turn_left()  # Turn left
-
-                # Follow the wall using the second ultrasonic sensor
-                while True:
-                    distance_2 = get_distance(ULTRASONIC_TRIGGER[1], ULTRASONIC_ECHO[1])
-                    print("Distance from Sensor 2:", distance_2, "cm")
-
-                    if distance_2 <= DISTANCE_THRESHOLD:
-                        # Move forward and maintain distance to the wall
-                        move_forward()
-                    else:
-                        # Turn left to adjust distance to the wall
-                        turn_left()
-
-                    time.sleep(0.1)  # Adjust delay as needed
+                # Stop
+                spin_motor(False, False)
+            
+            time.sleep(0.1)  # Adjust delay as needed
 
     except KeyboardInterrupt:
         print("Exiting program...")
