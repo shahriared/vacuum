@@ -1,17 +1,5 @@
-import os
-import sys
-import math
-
-import time
-
-import numpy as np
-import matplotlib.pyplot as plt
-
 import time
 import RPi.GPIO as GPIO
-
-from gpiozero import DistanceSensor
-
 
 # Constants
 MOTOR_1_PIN_1 = 11  # Left wheel
@@ -25,17 +13,11 @@ ULTRASONIC_FRONT_ECHO = 18
 ULTRASONIC_RIGHT_TRIGGER = 23
 ULTRASONIC_RIGHT_ECHO = 21
 
-# Ultrasonic sensors pins
-# ULTRASONIC_TRIGGER = [16, 19, 21, 23]
-# ULTRASONIC_ECHO = [18, 22, 24, 26]
-
 # Threshold distance
 DISTANCE_THRESHOLD = 10  # in cm
 
 # Turning time for 90-degree rotation (in seconds)
 TURNING_TIME = 2.24
-
-# do_animation = False
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
@@ -73,61 +55,31 @@ def turn_right():
     GPIO.output(MOTOR_2_PIN_2, True)
 
 def get_distance(trigger_pin, echo_pin):
-    # Send ultrasonic signal
     GPIO.output(trigger_pin, True)
     time.sleep(0.00001)
     GPIO.output(trigger_pin, False)
 
-    # Wait for echo
     pulse_start = time.time()
     pulse_end = time.time()
+
     while GPIO.input(echo_pin) == 0:
         pulse_start = time.time()
 
     while GPIO.input(echo_pin) == 1:
         pulse_end = time.time()
 
-    # Calculate distance
     pulse_duration = pulse_end - pulse_start
-    distance = pulse_duration * 17150  # Speed of sound is 343m/s, but we're measuring round trip
+    distance = pulse_duration * 17150  # Speed of sound in cm/s
     distance = round(distance, 2)  # Round to 2 decimal places
     return distance
 
 def main():
     setup_gpio()
 
-    # while True:
-    #     move_forward()
-    #     # Check distance from the front ultrasonic sensor
-    #     distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-    #     print("Distance from Front Sensor:", distance_front, "cm")
-
-    #     if distance_front > DISTANCE_THRESHOLD:
-    #         # Move forward
-    #         move_forward()
-    #     else:
-    #         # Stop and turn right for 90 degrees
-    #         move_backward()
-    #         time.sleep(TURNING_TIME)
-    #         turn_right()  # Turn right
-
-    #         # Follow the wall using the right ultrasonic sensor
-    #         while True:
-    #             distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-    #             print("Distance from Right Sensor:", distance_right, "cm")
-
-    #             if distance_right <= DISTANCE_THRESHOLD:
-    #                 # Move forward and maintain distance to the wall
-    #                 move_forward()
-    #             else:
-    #                 # Turn right to adjust distance to the wall
-    #                 turn_right()
-
-    #             time.sleep(0.1)
-
     try:
         while True:
             move_forward()
+
             # Check distance from the front ultrasonic sensor
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
