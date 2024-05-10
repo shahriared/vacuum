@@ -38,45 +38,45 @@ def move_forward():
     GPIO.output(MOTOR_2_PIN_2, False)
     return True
 
-def move_backward():
-    GPIO.output(MOTOR_1_PIN_1, False)
-    GPIO.output(MOTOR_1_PIN_2, True)
-    GPIO.output(MOTOR_2_PIN_1, False)
-    GPIO.output(MOTOR_2_PIN_2, True)
-    return True
+# def move_backward():
+#     GPIO.output(MOTOR_1_PIN_1, False)
+#     GPIO.output(MOTOR_1_PIN_2, True)
+#     GPIO.output(MOTOR_2_PIN_1, False)
+#     GPIO.output(MOTOR_2_PIN_2, True)
+#     return True
 
-def turn_left():
-    GPIO.output(MOTOR_1_PIN_1, False)
-    GPIO.output(MOTOR_1_PIN_2, True)
-    GPIO.output(MOTOR_2_PIN_1, True)
-    GPIO.output(MOTOR_2_PIN_2, False)
-    return True
+# def turn_left():
+#     GPIO.output(MOTOR_1_PIN_1, False)
+#     GPIO.output(MOTOR_1_PIN_2, True)
+#     GPIO.output(MOTOR_2_PIN_1, True)
+#     GPIO.output(MOTOR_2_PIN_2, False)
+#     return True
 
-def turn_right():
-    GPIO.output(MOTOR_1_PIN_1, True)
-    GPIO.output(MOTOR_1_PIN_2, False)
-    GPIO.output(MOTOR_2_PIN_1, False)
-    GPIO.output(MOTOR_2_PIN_2, True)
-    return True
+# def turn_right():
+#     GPIO.output(MOTOR_1_PIN_1, True)
+#     GPIO.output(MOTOR_1_PIN_2, False)
+#     GPIO.output(MOTOR_2_PIN_1, False)
+#     GPIO.output(MOTOR_2_PIN_2, True)
+#     return True
 
-def get_distance(trigger_pin, echo_pin):
-    GPIO.output(trigger_pin, True)
-    time.sleep(0.00001)
-    GPIO.output(trigger_pin, False)
+# def get_distance(trigger_pin, echo_pin):
+#     GPIO.output(trigger_pin, True)
+#     time.sleep(0.00001)
+#     GPIO.output(trigger_pin, False)
 
-    pulse_start = time.time()
-    pulse_end = time.time()
+#     pulse_start = time.time()
+#     pulse_end = time.time()
 
-    while GPIO.input(echo_pin) == 0:
-        pulse_start = time.time()
+#     while GPIO.input(echo_pin) == 0:
+#         pulse_start = time.time()
 
-    while GPIO.input(echo_pin) == 1:
-        pulse_end = time.time()
+#     while GPIO.input(echo_pin) == 1:
+#         pulse_end = time.time()
 
-    pulse_duration = pulse_end - pulse_start
-    distance = pulse_duration * 17150  # Speed of sound in cm/s
-    distance = round(distance, 2)  # Round to 2 decimal places
-    return distance
+#     pulse_duration = pulse_end - pulse_start
+#     distance = pulse_duration * 17150  # Speed of sound in cm/s
+#     distance = round(distance, 2)  # Round to 2 decimal places
+#     return distance
 
 def main():
     setup_gpio()
