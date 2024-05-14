@@ -89,7 +89,7 @@ def main():
                 turn_right()
                 time.sleep(TURNING_TIME)
 
-                while True:
+                while False:
                     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
                     print("Distance from Right Sensor:", distance_right, "cm")
 
