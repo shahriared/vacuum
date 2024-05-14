@@ -108,23 +108,24 @@ def main():
     #     else:
     #         move_backward()
     #     print('its after the else')
-    while True:
-        # Check distance from the front ultrasonic sensor
-        distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-        print("Distance from Front Sensor:", distance_front, "cm")
-        time.sleep(0.1)
+    # while True:
+    #     # Check distance from the front ultrasonic sensor
+    #     distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+    #     print("Distance from Front Sensor:", distance_front, "cm")
+    #     time.sleep(0.1)
     try:
         while True:
             # Check distance from the front ultrasonic sensor
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
 
-            # if distance_front > DISTANCE_THRESHOLD:
-            #     # Move forward
-            #     move_forward()
-            # else:
-            #     move_backward()
+            if distance_front > DISTANCE_THRESHOLD:
+                # Move forward
+                move_forward()
+            else:
+                move_backward()
             
+            time.sleep(0.1)
                 # # Follow the wall using the right ultrasonic sensor
                 # while True:
                 #     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
