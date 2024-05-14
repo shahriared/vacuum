@@ -77,7 +77,7 @@ def main():
     setup_gpio()
 
     try:
-        while False:
+        while True:
             # Check distance from the front ultrasonic sensor
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
@@ -85,25 +85,27 @@ def main():
             if distance_front > (DISTANCE_THRESHOLD - 5):
                 # Move forward
                 move_forward()
+            elif distance_front > DISTANCE_THRESHOLD:
+                # Move closer to the wall
+                turn_left()
+                time.sleep(0.1)
             else:
+                # Move forward and maintain distance to the wall
+                move_forward()
+
+            # Check distance from the right ultrasonic sensor
+            distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+            print("Distance from Right Sensor:", distance_right, "cm")
+
+            if distance_right <= DISTANCE_THRESHOLD:
+                # Move forward and maintain distance to the wall
+                move_forward()
+            else:
+                # Turn right to adjust distance to the wall
                 turn_right()
-                time.sleep(TURNING_TIME)
+                time.sleep(0.1)
 
-                while False:
-                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-                    print("Distance from Right Sensor:", distance_right, "cm")
-
-                    if distance_right <= DISTANCE_THRESHOLD:
-                        # Move forward and maintain distance to the wall
-                        move_forward()
-                    else:
-                        # Turn right to adjust distance to the wall
-                        turn_left()
-                        time.sleep(1)
-                        move_forward()
-                    time.sleep(0.5)
-
-            time.sleep(0.5)
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("Exiting program...")
