@@ -81,15 +81,15 @@ def get_distance(trigger_pin, echo_pin):
 def main():
     setup_gpio()
 
-    # move_forward()
+    move_forward()
 
     # try:
     while True:
         # move_forward()
 
         # Check distance from the front ultrasonic sensor
-        distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-        print("Distance from Front Sensor:", distance_front, "cm")
+        # distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        # print("Distance from Front Sensor:", distance_front, "cm")
 
         # if distance_front > DISTANCE_THRESHOLD:
         #     # Move forward
