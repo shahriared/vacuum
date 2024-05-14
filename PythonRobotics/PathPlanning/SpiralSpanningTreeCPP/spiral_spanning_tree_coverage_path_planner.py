@@ -112,6 +112,7 @@ def main():
             move_forward()
         else:
             move_backward()
+        print('its after the else')
     # try:
     #     while True:
     #         # move_forward()
