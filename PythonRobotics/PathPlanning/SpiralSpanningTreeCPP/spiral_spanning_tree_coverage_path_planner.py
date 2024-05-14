@@ -85,27 +85,25 @@ def main():
             if distance_front > (DISTANCE_THRESHOLD - 5):
                 # Move forward
                 move_forward()
-            elif distance_front > DISTANCE_THRESHOLD:
-                # Move closer to the wall
-                turn_left()
-                time.sleep(0.1)
             else:
-                # Move forward and maintain distance to the wall
-                move_forward()
-
-            # Check distance from the right ultrasonic sensor
-            distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-            print("Distance from Right Sensor:", distance_right, "cm")
-
-            if distance_right <= DISTANCE_THRESHOLD:
-                # Move forward and maintain distance to the wall
-                move_forward()
-            else:
-                # Turn right to adjust distance to the wall
                 turn_right()
-                time.sleep(0.1)
+                time.sleep(TURNING_TIME)
 
-            time.sleep(0.1)
+                while True:
+                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+                    print("Distance from Right Sensor:", distance_right, "cm")
+
+                    if distance_right <= DISTANCE_THRESHOLD:
+                        # Move forward and maintain distance to the wall
+                        move_forward()
+                    else:
+                        # Turn right to adjust distance to the wall
+                        turn_left()
+                        time.sleep(1)
+                        move_forward()
+                    time.sleep(0.5)
+
+            time.sleep(0.5)
 
     except KeyboardInterrupt:
         print("Exiting program...")
