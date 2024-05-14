@@ -36,28 +36,28 @@ def move_forward():
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
-    return True
+    # return True
 
 def move_backward():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
-    return True
+    # return True
 
 def turn_left():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
-    return True
+    # return True
 
 def turn_right():
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
-    return True
+    # return True
 
 def get_distance(trigger_pin, echo_pin):
     GPIO.output(trigger_pin, True)
