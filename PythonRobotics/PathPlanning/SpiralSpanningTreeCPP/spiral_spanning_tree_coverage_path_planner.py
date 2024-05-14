@@ -139,8 +139,9 @@ def main():
                         turn_left()
                         time.sleep(1)
                         move_forward()
-
                     time.sleep(0.5)
+
+            time.sleep(0.5)
                 # move_backward()
             
             # time.sleep(0.1)
