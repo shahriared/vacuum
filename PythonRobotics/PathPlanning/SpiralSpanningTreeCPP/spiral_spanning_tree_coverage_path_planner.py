@@ -113,6 +113,8 @@ def main():
                 move_forward()
             else:
                 move_backward()
+            
+            
                 # # Stop and turn right for 90 degrees
                 # move_backward()
                 # time.sleep(TURNING_TIME)
