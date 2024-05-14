@@ -137,6 +137,8 @@ def main():
                     else:
                         # Turn right to adjust distance to the wall
                         turn_left()
+                        time.sleep(1)
+                        move_forward()
 
                     time.sleep(0.5)
                 # move_backward()
