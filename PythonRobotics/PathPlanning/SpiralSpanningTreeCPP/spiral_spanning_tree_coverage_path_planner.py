@@ -119,7 +119,7 @@ def main():
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
 
-            if distance_front > DISTANCE_THRESHOLD:
+            if distance_front > (DISTANCE_THRESHOLD - 5):
                 # Move forward
                 move_forward()
             else:
