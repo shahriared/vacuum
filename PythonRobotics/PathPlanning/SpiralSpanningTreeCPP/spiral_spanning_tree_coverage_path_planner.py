@@ -84,7 +84,7 @@ def main():
     move_forward()
 
     # try:
-    while True:
+    # while True:
         # move_forward()
 
         # Check distance from the front ultrasonic sensor
