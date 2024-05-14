@@ -76,43 +76,6 @@ def get_distance(trigger_pin, echo_pin):
 def main():
     setup_gpio()
 
-    # move_forward()
-
-    # try:
-    #     while True:
-    #         move_forward()
-    #         time.sleep(1)
-    #         turn_right()
-    #         time.sleep(1)
-    #         turn_left()
-    #         time.sleep(1)
-    #         move_backward()
-    #         time.sleep(1)
-
-    #         distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-    #         print("Distance from Front Sensor:", distance_front, "cm")
-    # except KeyboardInterrupt:
-    #     print("Exiting program...")
-    # finally:
-    #     GPIO.cleanup()
-    # while True:
-    #     # move_forward()
-
-    #     # Check distance from the front ultrasonic sensor
-    #     distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-    #     print("Distance from Front Sensor:", distance_front, "cm")
-
-    #     if distance_front > DISTANCE_THRESHOLD:
-    #         # Move forward
-    #         move_forward()
-    #     else:
-    #         move_backward()
-    #     print('its after the else')
-    # while True:
-    #     # Check distance from the front ultrasonic sensor
-    #     distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-    #     print("Distance from Front Sensor:", distance_front, "cm")
-    #     time.sleep(0.1)
     try:
         while True:
             # Check distance from the front ultrasonic sensor
@@ -123,30 +86,35 @@ def main():
                 # Move forward
                 move_forward()
             else:
+                # Stop and measure distance from the right sensor
+                move_backward()
+                time.sleep(0.5)  # Adjust as needed for reversing
                 turn_right()
-                time.sleep(TURNING_TIME)
+                start_time = time.time()
 
                 while True:
                     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
                     print("Distance from Right Sensor:", distance_right, "cm")
 
-                    if distance_right <= DISTANCE_THRESHOLD:
-                        # Move forward and maintain distance to the wall
+                    if distance_right > (DISTANCE_THRESHOLD + 5):
+                        # We have found an area with no wall, break the loop
+                        break
+                    elif time.time() - start_time > TURNING_TIME:
+                        # If turning for too long, stop turning and move forward
                         move_forward()
+                        break
                     else:
-                        # Turn right to adjust distance to the wall
-                        turn_left()
-                        time.sleep(1)
-                        move_forward()
-                    time.sleep(0.5)
+                        # Continue turning
+                        turn_right()
 
-            time.sleep(0.5)
+                    time.sleep(0.1)  # Adjust as needed for turning responsiveness
+
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("Exiting program...")
     finally:
         GPIO.cleanup()
-
 
 if __name__ == "__main__":
     main()
