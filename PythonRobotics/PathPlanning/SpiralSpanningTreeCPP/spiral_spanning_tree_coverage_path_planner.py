@@ -114,11 +114,11 @@ def main():
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
 
-            if distance_front > DISTANCE_THRESHOLD:
-                # Move forward
-                move_forward()
-            else:
-                move_backward()
+            # if distance_front > DISTANCE_THRESHOLD:
+            #     # Move forward
+            #     move_forward()
+            # else:
+            #     move_backward()
             
                 # # Follow the wall using the right ultrasonic sensor
                 # while True:
