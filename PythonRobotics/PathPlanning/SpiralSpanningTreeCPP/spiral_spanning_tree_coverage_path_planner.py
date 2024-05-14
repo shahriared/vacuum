@@ -123,22 +123,41 @@ def main():
                 # Move forward
                 move_forward()
             else:
-                move_backward()
+
+                # Turn left
+                turn_left()
+                time.sleep(TURNING_TIME)
+
+                move_forward()
+
+                while True:
+                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+                    print("Distance from Right Sensor:", distance_right, "cm")
+
+                    if distance_right <= DISTANCE_THRESHOLD:
+                        # Move forward and maintain distance to the wall
+                        move_forward()
+                    else:
+                        # Turn right to adjust distance to the wall
+                        turn_right()
+
+                    time.sleep(0.5)
+                # move_backward()
             
-            time.sleep(0.1)
-                # # Follow the wall using the right ultrasonic sensor
-                # while True:
-                #     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-                #     print("Distance from Right Sensor:", distance_right, "cm")
+            # time.sleep(0.1)
+                # Follow the wall using the right ultrasonic sensor
+                while True:
+                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+                    print("Distance from Right Sensor:", distance_right, "cm")
 
-                #     if distance_right <= DISTANCE_THRESHOLD:
-                #         # Move forward and maintain distance to the wall
-                #         move_forward()
-                #     else:
-                #         # Turn right to adjust distance to the wall
-                #         turn_right()
+                    if distance_right <= DISTANCE_THRESHOLD:
+                        # Move forward and maintain distance to the wall
+                        move_forward()
+                    else:
+                        # Turn right to adjust distance to the wall
+                        turn_right()
 
-                #     time.sleep(0.1)  # Adjust delay as needed
+                    time.sleep(0.5)  # Adjust delay as needed
 
     except KeyboardInterrupt:
         print("Exiting program...")
