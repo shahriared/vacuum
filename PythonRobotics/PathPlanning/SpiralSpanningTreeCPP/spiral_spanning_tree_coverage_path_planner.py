@@ -77,7 +77,7 @@ def main():
     setup_gpio()
 
     try:
-        while True:
+        while False:
             # Check distance from the front ultrasonic sensor
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
