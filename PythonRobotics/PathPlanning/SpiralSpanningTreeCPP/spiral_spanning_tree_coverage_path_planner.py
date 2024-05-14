@@ -83,15 +83,20 @@ def main():
 
     # move_forward()
 
-    while True:
-        move_forward()
-        time.sleep(1)
-        turn_right()
-        time.sleep(1)
-        turn_left()
-        time.sleep(1)
-        move_backward()
-        time.sleep(1)
+    try:
+        while True:
+            move_forward()
+            time.sleep(1)
+            turn_right()
+            time.sleep(1)
+            turn_left()
+            time.sleep(1)
+            move_backward()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Exiting program...")
+    finally:
+        GPIO.cleanup()
     # try:
     # while True:
         # move_forward()
