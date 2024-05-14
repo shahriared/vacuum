@@ -83,6 +83,10 @@ def main():
 
     move_forward()
 
+    while True:
+        distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        print("Distance from Front Sensor:", distance_front, "cm")
+
     # try:
     # while True:
         # move_forward()
