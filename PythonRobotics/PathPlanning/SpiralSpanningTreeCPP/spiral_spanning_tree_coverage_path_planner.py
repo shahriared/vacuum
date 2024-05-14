@@ -123,12 +123,9 @@ def main():
                 # Move forward
                 move_forward()
             else:
-
                 # Turn left
                 turn_left()
                 time.sleep(TURNING_TIME)
-
-                move_forward()
 
                 while True:
                     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
@@ -139,7 +136,7 @@ def main():
                         move_forward()
                     else:
                         # Turn right to adjust distance to the wall
-                        turn_right()
+                        turn_left()
 
                     time.sleep(0.5)
                 # move_backward()
