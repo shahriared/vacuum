@@ -1,3 +1,4 @@
+User
 import time
 import RPi.GPIO as GPIO
 
@@ -86,35 +87,30 @@ def main():
                 # Move forward
                 move_forward()
             else:
-                # Stop and measure distance from the right sensor
-                move_backward()
-                time.sleep(0.5)  # Adjust as needed for reversing
                 turn_right()
-                start_time = time.time()
+                time.sleep(TURNING_TIME)
 
                 while True:
                     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
                     print("Distance from Right Sensor:", distance_right, "cm")
 
-                    if distance_right > (DISTANCE_THRESHOLD + 5):
-                        # We have found an area with no wall, break the loop
-                        break
-                    elif time.time() - start_time > TURNING_TIME:
-                        # If turning for too long, stop turning and move forward
+                    if distance_right <= DISTANCE_THRESHOLD:
+                        # Move forward and maintain distance to the wall
                         move_forward()
-                        break
                     else:
-                        # Continue turning
-                        turn_right()
+                        # Turn right to adjust distance to the wall
+                        turn_left()
+                        time.sleep(1)
+                        move_forward()
+                    time.sleep(0.5)
 
-                    time.sleep(0.1)  # Adjust as needed for turning responsiveness
-
-            time.sleep(0.1)
+            time.sleep(0.5)
 
     except KeyboardInterrupt:
         print("Exiting program...")
     finally:
         GPIO.cleanup()
+
 
 if __name__ == "__main__":
     main()
