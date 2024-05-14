@@ -123,8 +123,7 @@ def main():
                 # Move forward
                 move_forward()
             else:
-                # Turn left
-                turn_left()
+                turn_right()
                 time.sleep(TURNING_TIME)
 
                 while True:
@@ -136,7 +135,7 @@ def main():
                         move_forward()
                     else:
                         # Turn right to adjust distance to the wall
-                        turn_left()
+                        turn_right()
                         time.sleep(1)
                         move_forward()
                     time.sleep(0.5)
