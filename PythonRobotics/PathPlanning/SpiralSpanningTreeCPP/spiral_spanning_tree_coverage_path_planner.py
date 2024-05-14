@@ -108,40 +108,37 @@ def main():
     #     else:
     #         move_backward()
     #     print('its after the else')
-    while True:
-        # Check distance from the front ultrasonic sensor
-        distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-        print("Distance from Front Sensor:", distance_front, "cm")
     try:
         while True:
             # Check distance from the front ultrasonic sensor
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print("Distance from Front Sensor:", distance_front, "cm")
 
-            # if distance_front > DISTANCE_THRESHOLD:
-            #     # Move forward
-            #     move_forward()
-            # else:
-            #     move_backward()
-            
-                # # Follow the wall using the right ultrasonic sensor
-                # while True:
-                #     distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-                #     print("Distance from Right Sensor:", distance_right, "cm")
+            if distance_front <= DISTANCE_THRESHOLD:
+                print("Obstacle detected in front. Stopping...")
+                break  # Break out of the loop if obstacle detected
+            else:
+                # Move forward
+                move_forward()
 
-                #     if distance_right <= DISTANCE_THRESHOLD:
-                #         # Move forward and maintain distance to the wall
-                #         move_forward()
-                #     else:
-                #         # Turn right to adjust distance to the wall
-                #         turn_right()
+            # Follow the wall using the right ultrasonic sensor
+            distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+            print("Distance from Right Sensor:", distance_right, "cm")
 
-                #     time.sleep(0.1)  # Adjust delay as needed
+            if distance_right <= DISTANCE_THRESHOLD:
+                print("Obstacle detected on the right. Stopping...")
+                break  # Break out of the loop if obstacle detected
+            else:
+                # Move forward and maintain distance to the wall
+                move_forward()
+
+            time.sleep(0.1)  # Adjust delay as needed
 
     except KeyboardInterrupt:
         print("Exiting program...")
     finally:
         GPIO.cleanup()
+
 
 
 if __name__ == "__main__":
