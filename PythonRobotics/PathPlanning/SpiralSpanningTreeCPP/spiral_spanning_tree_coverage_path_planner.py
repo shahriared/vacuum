@@ -108,6 +108,10 @@ def main():
     #     else:
     #         move_backward()
     #     print('its after the else')
+    while True:
+        # Check distance from the front ultrasonic sensor
+        distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        print("Distance from Front Sensor:", distance_front, "cm")
     try:
         while True:
             # Check distance from the front ultrasonic sensor
