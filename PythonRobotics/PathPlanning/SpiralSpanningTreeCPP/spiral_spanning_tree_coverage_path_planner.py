@@ -1,23 +1,22 @@
 import time
 import RPi.GPIO as GPIO
 
-# Constants
+# Constants for motor control pins
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
 MOTOR_2_PIN_1 = 16
 MOTOR_2_PIN_2 = 18
 
-# Ultrasonic sensors pins
-ULTRASONIC_FRONT_TRIGGER = 5
-ULTRASONIC_FRONT_ECHO = 3
-ULTRASONIC_RIGHT_TRIGGER = 23
-ULTRASONIC_RIGHT_ECHO = 21
+# Ultrasonic sensor pins
+ULTRASONIC_LEFT_TRIGGER = 3
+ULTRASONIC_LEFT_ECHO = 5
+ULTRASONIC_FRONT_TRIGGER = 6
+ULTRASONIC_FRONT_ECHO = 9
+ULTRASONIC_RIGHT_TRIGGER = 10
+ULTRASONIC_RIGHT_ECHO = 11
 
-# Threshold distance
-DISTANCE_THRESHOLD = 10  # in cm
-
-# Turning time for 90-degree rotation (in seconds)
-TURNING_TIME = 2.24
+# Threshold distances (in cm)
+DISTANCE_THRESHOLD = 20
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
@@ -25,6 +24,8 @@ def setup_gpio():
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
@@ -54,6 +55,12 @@ def turn_right():
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
 
+def stop():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, False)
+    GPIO.output(MOTOR_2_PIN_2, False)
+
 def get_distance(trigger_pin, echo_pin):
     GPIO.output(trigger_pin, True)
     time.sleep(0.00001)
@@ -78,38 +85,38 @@ def main():
 
     try:
         while True:
-            # Check distance from the front ultrasonic sensor
+            distance_left = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
             distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-            print("Distance from Front Sensor:", distance_front, "cm")
+            distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
 
-            if distance_front > (DISTANCE_THRESHOLD - 5):
-                # Move forward
+            print("Distance Left:", distance_left, "cm")
+            print("Distance Front:", distance_front, "cm")
+            print("Distance Right:", distance_right, "cm")
+
+            if ((distance_left <= DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right <= DISTANCE_THRESHOLD) or
+                (distance_left > DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD)):
                 move_forward()
-            else:
+
+            elif ((distance_left <= DISTANCE_THRESHOLD and distance_front <= DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD) or
+                  (distance_left <= DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD)):
+                stop()
+                turn_left()
+                time.sleep(0.1)
+
+            elif ((distance_left > DISTANCE_THRESHOLD and distance_front <= DISTANCE_THRESHOLD and distance_right <= DISTANCE_THRESHOLD) or
+                  (distance_left > DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right <= DISTANCE_THRESHOLD) or
+                  (distance_left > DISTANCE_THRESHOLD and distance_front <= DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD)):
+                stop()
                 turn_right()
-                time.sleep(TURNING_TIME)
+                time.sleep(0.1)
 
-                while True:
-                    distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-                    print("Distance from Right Sensor:", distance_right, "cm")
-
-                    if distance_right <= DISTANCE_THRESHOLD:
-                        # Move forward and maintain distance to the wall
-                        move_forward()
-                    else:
-                        # Turn right to adjust distance to the wall
-                        turn_left()
-                        time.sleep(1)
-                        move_forward()
-                    time.sleep(0.5)
-
-            time.sleep(0.5)
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("Exiting program...")
+
     finally:
         GPIO.cleanup()
-
 
 if __name__ == "__main__":
     main()
