@@ -1,18 +1,11 @@
 import time
 import RPi.GPIO as GPIO
 
-# Constants for motor control pins
-
+# Constants
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
 MOTOR_2_PIN_1 = 16
 MOTOR_2_PIN_2 = 18
-
-# Ultrasonic sensors pins
-ULTRASONIC_FRONT_TRIGGER = 5
-ULTRASONIC_FRONT_ECHO = 3
-ULTRASONIC_RIGHT_TRIGGER = 23
-ULTRASONIC_RIGHT_ECHO = 21
 
 # Ultrasonic sensor pins
 ULTRASONIC_LEFT_TRIGGER = 38
@@ -22,8 +15,11 @@ ULTRASONIC_FRONT_ECHO = 3
 ULTRASONIC_RIGHT_TRIGGER = 23
 ULTRASONIC_RIGHT_ECHO = 21
 
-# Threshold distances (in cm)
-DISTANCE_THRESHOLD = 20
+# Threshold distance
+DISTANCE_THRESHOLD = 10  # in cm
+
+# Turning time for 90-degree rotation (in seconds)
+TURNING_TIME = 2.24
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
@@ -31,12 +27,12 @@ def setup_gpio():
     GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
     GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
+    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
 
 def move_forward():
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -55,18 +51,14 @@ def turn_left():
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
+    time.sleep(2.24)
 
 def turn_right():
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
-
-def stop():
-    GPIO.output(MOTOR_1_PIN_1, False)
-    GPIO.output(MOTOR_1_PIN_2, False)
-    GPIO.output(MOTOR_2_PIN_1, False)
-    GPIO.output(MOTOR_2_PIN_2, False)
+    time.sleep(2.24)
 
 def get_distance(trigger_pin, echo_pin):
     GPIO.output(trigger_pin, True)
@@ -90,40 +82,40 @@ def get_distance(trigger_pin, echo_pin):
 def main():
     setup_gpio()
 
-    try:
-        while True:
-            distance_left = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
-            distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-            distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+    # try:
+    #     while True:
+    #         # Check distance from the front ultrasonic sensor
+    #         distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+    #         print("Distance from Front Sensor:", distance_front, "cm")
 
-            print("Distance Left:", distance_left, "cm")
-            print("Distance Front:", distance_front, "cm")
-            print("Distance Right:", distance_right, "cm")
+    #         if distance_front > (DISTANCE_THRESHOLD - 5):
+    #             # Move forward
+    #             move_forward()
+    #         else:
+    #             turn_right()
+    #             time.sleep(TURNING_TIME)
 
-            if ((distance_left <= DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right <= DISTANCE_THRESHOLD) or
-                (distance_left > DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD)):
-                move_forward()
+    #             while True:
+    #                 distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+    #                 print("Distance from Right Sensor:", distance_right, "cm")
 
-            elif ((distance_left <= DISTANCE_THRESHOLD and distance_front <= DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD) or
-                  (distance_left <= DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD)):
-                stop()
-                turn_left()
-                time.sleep(0.1)
+    #                 if distance_right <= (DISTANCE_THRESHOLD - 5) or distance_right <= (DISTANCE_THRESHOLD + 5):
+    #                     # Move forward and maintain distance to the wall
+    #                     move_forward()
+    #                 else:
+    #                     # Turn right to adjust distance to the wall
+    #                     turn_left()
+    #                     time.sleep(1)
+    #                     move_forward()
+    #                 time.sleep(0.5)
 
-            elif ((distance_left > DISTANCE_THRESHOLD and distance_front <= DISTANCE_THRESHOLD and distance_right <= DISTANCE_THRESHOLD) or
-                  (distance_left > DISTANCE_THRESHOLD and distance_front > DISTANCE_THRESHOLD and distance_right <= DISTANCE_THRESHOLD) or
-                  (distance_left > DISTANCE_THRESHOLD and distance_front <= DISTANCE_THRESHOLD and distance_right > DISTANCE_THRESHOLD)):
-                stop()
-                turn_right()
-                time.sleep(0.1)
+    #         time.sleep(0.5)
 
-            time.sleep(0.1)
+    # except KeyboardInterrupt:
+    #     print("Exiting program...")
+    # finally:
+    #     GPIO.cleanup()
 
-    except KeyboardInterrupt:
-        print("Exiting program...")
-
-    finally:
-        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()
