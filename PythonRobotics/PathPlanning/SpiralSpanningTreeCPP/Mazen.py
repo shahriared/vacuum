@@ -16,9 +16,17 @@ ULTRASONIC_RIGHT_TRIGGER = 23
 ULTRASONIC_RIGHT_ECHO = 21
 
 # Threshold distances in centimeters
-TOO_CLOSE_WALL = 10.0
-TOO_FAR_WALL = 17.0
-TOO_CLOSE_FRONT = 5.0
+TOO_CLOSE_WALL = 18.0
+TOO_FAR_WALL = 25.0
+TOO_CLOSE_FRONT = 10.0
+
+# Time to turn 90 degrees (in seconds)
+TURNING_TIME = 2.24
+
+# Threshold distances in centimeters
+TOO_CLOSE_WALL = 18.0
+TOO_FAR_WALL = 25.0
+TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
 TURNING_TIME = 2.24
@@ -132,7 +140,7 @@ def main():
             if TOO_CLOSE_WALL < left_distance < TOO_FAR_WALL:
                 move_forward()
                 print("Drive forward")
-                time.sleep(0.3)
+                time.sleep(0.1)
                 continue
 
             if left_distance <= TOO_CLOSE_WALL:
