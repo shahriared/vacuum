@@ -40,6 +40,10 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
+    motor_pwm_1 = GPIO.PWM(MOTOR_1_PIN_1, 100)  # 100 Hz frequency
+    motor_pwm_2 = GPIO.PWM(MOTOR_2_PIN_1, 100)
+    motor_pwm_1.start(0)  # Start with 0% duty cycle (stopped)
+    motor_pwm_2.start(0)
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -51,7 +55,11 @@ def move_forward():
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
-    print("Moving forward")
+    motor_pwm_1.ChangeDutyCycle(speed_percen=75)
+    motor_pwm_2.ChangeDutyCycle(speed_percent=50)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_2, False)
+    print(f"Moving forward at {speed_percent}% speed")
 
 def move_backward():
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -65,20 +73,30 @@ def turn_left():
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
-    print("Turning left")
+    motor_pwm_1.ChangeDutyCycle(speed_percent=75)
+    motor_pwm_2.ChangeDutyCycle(speed_percent=60)
+    GPIO.output(MOTOR_1_PIN_2, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
+    print(f"Turning left at {speed_percent}% speed")
 
 def turn_right():
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
-    print("Turning right")
+    motor_pwm_1.ChangeDutyCycle(speed_percent=75)
+    motor_pwm_2.ChangeDutyCycle(speed_percent=50)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_2, True)
+    print(f"Turning right at {speed_percent}% speed")
 
 def stop_motors():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, False)
+    motor_pwm_1.ChangeDutyCycle(0)  # Stop by setting duty cycle to 0%
+    motor_pwm_2.ChangeDutyCycle(0)
     print("Motors stopped")
 
 def get_distance(trigger_pin, echo_pin):
