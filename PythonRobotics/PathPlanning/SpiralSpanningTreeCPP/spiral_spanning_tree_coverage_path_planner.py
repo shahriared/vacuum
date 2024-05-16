@@ -107,12 +107,10 @@ def main():
         while True:
             print("Starting distance measurement")
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-            left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
-            right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+
+            time.sleep(0.1)  # Sleep for 100 ms
 
             print(f"Front: {front_distance} cm")
-            print(f"Left: {left_distance} cm")
-            print(f"Right: {right_distance} cm")
 
             last_turn = 'right'
 
