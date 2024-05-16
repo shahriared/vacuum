@@ -23,14 +23,6 @@ TOO_CLOSE_FRONT = 10.0
 # Time to turn 90 degrees (in seconds)
 TURNING_TIME = 2.24
 
-# Threshold distances in centimeters
-TOO_CLOSE_WALL = 18.0
-TOO_FAR_WALL = 25.0
-TOO_CLOSE_FRONT = 10.0
-
-# Time to turn 90 degrees (in seconds)
-TURNING_TIME = 2.24
-
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
