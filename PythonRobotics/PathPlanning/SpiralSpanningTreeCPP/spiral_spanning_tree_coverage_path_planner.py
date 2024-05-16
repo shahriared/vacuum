@@ -23,14 +23,6 @@ TOO_CLOSE_FRONT = 10.0
 # Time to turn 90 degrees (in seconds)
 TURNING_TIME = 2.24
 
-# Threshold distances in centimeters
-TOO_CLOSE_WALL = 18.0
-TOO_FAR_WALL = 25.0
-TOO_CLOSE_FRONT = 10.0
-
-# Time to turn 90 degrees (in seconds)
-TURNING_TIME = 2.24
-
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
@@ -52,6 +44,7 @@ def move_forward():
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
     print("Moving forward")
+    time.sleep(2)  # Move forward for 2 seconds
 
 def move_backward():
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -59,6 +52,7 @@ def move_backward():
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
     print("Moving backward")
+    time.sleep(2)  # Move backward for 2 seconds
 
 def turn_left():
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -66,6 +60,7 @@ def turn_left():
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
     print("Turning left")
+    time.sleep(TURNING_TIME)  # Rotate left for 90 degrees
 
 def turn_right():
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -73,6 +68,7 @@ def turn_right():
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
     print("Turning right")
+    time.sleep(TURNING_TIME)  # Rotate right for 90 degrees
 
 def stop_motors():
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -118,7 +114,26 @@ def main():
             print(f"Left: {left_distance} cm")
             print(f"Right: {right_distance} cm")
 
-            
+            last_turn = 'right'
+
+            if front_distance < TOO_CLOSE_FRONT:
+                stop_motors()
+                if last_turn == 'right':
+                    turn_left()
+                    last_turn = 'left'
+                else:
+                    turn_right()
+                    last_turn = 'right'
+                move_forward()
+                time.sleep(2)
+                if last_turn == 'right':
+                    turn_left()
+                    last_turn = 'left'
+                else:
+                    turn_right()
+                    last_turn = 'right'
+            else:
+                move_forward()  # Move forward normally
 
     except KeyboardInterrupt:
         pass
@@ -127,4 +142,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
