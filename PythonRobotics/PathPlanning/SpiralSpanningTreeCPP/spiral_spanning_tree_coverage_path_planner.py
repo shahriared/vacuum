@@ -89,24 +89,19 @@ def get_distance(trigger_pin, echo_pin):
     pulse_start = time.time()
     pulse_end = time.time()
 
-    print(f"Measuring distance on trigger pin {trigger_pin} and echo pin {echo_pin}")
-
     while GPIO.input(echo_pin) == 0:
         pulse_start = time.time()
         if time.time() - pulse_start > 0.04:  # Timeout after 40 ms
-            print(f"Timeout waiting for echo signal to start (pin {trigger_pin})")
             return -1
 
     while GPIO.input(echo_pin) == 1:
         pulse_end = time.time()
         if time.time() - pulse_end > 0.04:  # Timeout after 40 ms
-            print(f"Timeout waiting for echo signal to end (pin {trigger_pin})")
             return -1
 
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Speed of sound in cm/s
     distance = round(distance, 2)
-    print(f"Distance measured: {distance} cm on trigger pin {trigger_pin}")
     return distance
 
 def main():
@@ -119,7 +114,9 @@ def main():
             left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
             right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
 
-            print(f"Front distance: {front_distance} cm, Left distance: {left_distance} cm, Right distance: {right_distance} cm")
+            print(f"Front: {front_distance} cm")
+            print(f"Left: {left_distance} cm")
+            print(f"Right: {right_distance} cm")
 
             
 
