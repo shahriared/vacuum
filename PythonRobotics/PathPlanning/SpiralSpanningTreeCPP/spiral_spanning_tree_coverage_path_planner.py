@@ -118,18 +118,18 @@ def main():
                 stop_motors()
                 if last_turn == 'right':
                     turn_left()
-                    last_turn = 'left'
-                else:
-                    turn_right()
-                    last_turn = 'right'
-                move_forward()
-                time.sleep(2)
-                if last_turn == 'right':
+                    move_forward()
+                    time.sleep(2)
                     turn_left()
                     last_turn = 'left'
                 else:
                     turn_right()
+                    move_forward()
+                    time.sleep(2)
+                    turn_right()
                     last_turn = 'right'
+               
+                
             else:
                 move_forward()  # Move forward normally
 
