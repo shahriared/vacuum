@@ -1,6 +1,6 @@
 import time
 import RPi.GPIO as GPIO
-import keyboard
+import curses
 
 # Constants
 MOTOR_1_PIN_1 = 11
@@ -88,18 +88,23 @@ def get_distance(trigger_pin, echo_pin):
     distance = round(distance, 2)  # Round to 2 decimal places
     return distance
 
-def main():
+def main(stdscr):
     setup_gpio()
+
+    curses.curs_set(0)  # Hide the cursor
+    stdscr.nodelay(1)  # Non-blocking input
+    stdscr.timeout(100)  # Timeout for getch()
 
     try:
         while True:
-            if keyboard.is_pressed('up'):
+            key = stdscr.getch()
+            if key == curses.KEY_UP:
                 move_forward()
-            elif keyboard.is_pressed('down'):
+            elif key == curses.KEY_DOWN:
                 move_backward()
-            elif keyboard.is_pressed('left'):
+            elif key == curses.KEY_LEFT:
                 turn_left()
-            elif keyboard.is_pressed('right'):
+            elif key == curses.KEY_RIGHT:
                 turn_right()
             else:
                 stop_movement()
@@ -110,4 +115,4 @@ def main():
         GPIO.cleanup()
 
 if __name__ == "__main__":
-    main()
+    curses.wrapper(main)
