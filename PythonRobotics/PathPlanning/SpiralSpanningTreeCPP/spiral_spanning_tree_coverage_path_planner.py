@@ -121,45 +121,7 @@ def main():
 
             print(f"Front distance: {front_distance} cm, Left distance: {left_distance} cm, Right distance: {right_distance} cm")
 
-            if front_distance == -1 or left_distance == -1 or right_distance == -1:
-                print("Error reading distance, skipping this cycle")
-                continue
-
-            if front_distance < TOO_CLOSE_FRONT:
-                stop_motors()
-                move_backward()
-                time.sleep(0.5)
-                stop_motors()
-                turn_right()
-                time.sleep(0.8)
-                stop_motors()
-                move_forward()
-                time.sleep(1.7)
-                continue
-
-            if TOO_CLOSE_WALL < left_distance < TOO_FAR_WALL:
-                move_forward()
-                print("Drive forward")
-                time.sleep(0.1)
-                continue
-
-            if left_distance <= TOO_CLOSE_WALL:
-                stop_motors()
-                turn_right()
-                time.sleep(0.5)
-                stop_motors()
-                move_forward()
-                time.sleep(1)
-                continue
-
-            if left_distance >= TOO_FAR_WALL:
-                stop_motors()
-                turn_left()
-                time.sleep(0.5)
-                stop_motors()
-                move_forward()
-                time.sleep(1)
-                continue
+            
 
     except KeyboardInterrupt:
         pass
@@ -168,3 +130,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
