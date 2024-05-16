@@ -25,49 +25,53 @@ TURNING_TIME = 2.24
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(MOTOR_1_PIN_1, GPIO.OUT)
-    GPIO.setup(MOTOR_1_PIN_2, GPIO.OUT)
-    GPIO.setup(MOTOR_2_PIN_1, GPIO.OUT)
-    GPIO.setup(MOTOR_2_PIN_2, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
+    GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
+    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
+    print("GPIO setup complete")
 
 def cleanup_gpio():
     GPIO.cleanup()
+    print("GPIO cleaned up")
 
 def move_forward():
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
+    print("Moving forward")
 
 def move_backward():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
+    print("Moving backward")
 
 def turn_left():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
+    print("Turning left")
 
 def turn_right():
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
+    print("Turning right")
 
 def stop_motors():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, False)
+    print("Motors stopped")
 
 def get_distance(trigger_pin, echo_pin):
     GPIO.output(trigger_pin, True)
@@ -79,14 +83,19 @@ def get_distance(trigger_pin, echo_pin):
 
     while GPIO.input(echo_pin) == 0:
         pulse_start = time.time()
+        if time.time() - pulse_start > 0.04:  # Timeout after 40 ms
+            print(f"Timeout waiting for echo signal to start (pin {trigger_pin})")
+            return -1
 
     while GPIO.input(echo_pin) == 1:
         pulse_end = time.time()
+        if time.time() - pulse_end > 0.04:  # Timeout after 40 ms
+            print(f"Timeout waiting for echo signal to end (pin {trigger_pin})")
+            return -1
 
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Speed of sound in cm/s
-    distance = round(distance, 2)  # Round to 2 decimal places
-    return distance
+    return round(distance, 2)
 
 def main():
     try:
@@ -95,10 +104,11 @@ def main():
         while True:
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
+            right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
 
-            print(f"Front distance: {front_distance} cm, Wall distance: {left_distance} cm")
+            print(f"Front distance: {front_distance} cm, Left distance: {left_distance} cm, Right distance: {right_distance} cm")
 
-            if front_distance == -1 or left_distance == -1:
+            if front_distance == -1 or left_distance == -1 or right_distance == -1:
                 print("Error reading distance, skipping this cycle")
                 continue
 
