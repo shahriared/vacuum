@@ -85,7 +85,8 @@ def get_distance(trigger_pin, echo_pin):
 
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Speed of sound in cm/s
-    return round(distance, 2)
+    distance = round(distance, 2)  # Round to 2 decimal places
+    return distance
 
 def main():
     try:
@@ -96,6 +97,10 @@ def main():
             left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
 
             print(f"Front distance: {front_distance} cm, Wall distance: {left_distance} cm")
+
+            if front_distance == -1 or left_distance == -1:
+                print("Error reading distance, skipping this cycle")
+                continue
 
             if front_distance < TOO_CLOSE_FRONT:
                 stop_motors()
