@@ -16,12 +16,9 @@ ULTRASONIC_RIGHT_TRIGGER = 23
 ULTRASONIC_RIGHT_ECHO = 21
 
 # Threshold distances in centimeters
-TOO_CLOSE_WALL = 10.0
-TOO_FAR_WALL = 17.0
-TOO_CLOSE_FRONT = 5.0
-
-# Time to turn 90 degrees (in seconds)
-TURNING_TIME = 2.24
+TOO_CLOSE_WALL = 18.0
+TOO_FAR_WALL = 25.0
+TURN_DELAY = 0.5  # Time to maintain each direction (in seconds)
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
@@ -113,4 +110,3 @@ def zigzag():
 
 if __name__ == "__main__":
     zigzag()
-    main()
