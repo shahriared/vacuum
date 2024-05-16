@@ -1,5 +1,6 @@
 import time
 import RPi.GPIO as GPIO
+import keyboard
 
 # Constants
 MOTOR_1_PIN_1 = 11
@@ -51,14 +52,22 @@ def turn_left():
     GPIO.output(MOTOR_1_PIN_2, True)
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
-    time.sleep(2.24)
+    time.sleep(TURNING_TIME)
+    stop_movement()
 
 def turn_right():
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     GPIO.output(MOTOR_2_PIN_1, False)
     GPIO.output(MOTOR_2_PIN_2, True)
-    time.sleep(2.24)
+    time.sleep(TURNING_TIME)
+    stop_movement()
+
+def stop_movement():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, False)
+    GPIO.output(MOTOR_2_PIN_2, False)
 
 def get_distance(trigger_pin, echo_pin):
     GPIO.output(trigger_pin, True)
@@ -82,40 +91,23 @@ def get_distance(trigger_pin, echo_pin):
 def main():
     setup_gpio()
 
-    # try:
-    #     while True:
-    #         # Check distance from the front ultrasonic sensor
-    #         distance_front = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-    #         print("Distance from Front Sensor:", distance_front, "cm")
-
-    #         if distance_front > (DISTANCE_THRESHOLD - 5):
-    #             # Move forward
-    #             move_forward()
-    #         else:
-    #             turn_right()
-    #             time.sleep(TURNING_TIME)
-
-    #             while True:
-    #                 distance_right = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
-    #                 print("Distance from Right Sensor:", distance_right, "cm")
-
-    #                 if distance_right <= (DISTANCE_THRESHOLD - 5) or distance_right <= (DISTANCE_THRESHOLD + 5):
-    #                     # Move forward and maintain distance to the wall
-    #                     move_forward()
-    #                 else:
-    #                     # Turn right to adjust distance to the wall
-    #                     turn_left()
-    #                     time.sleep(1)
-    #                     move_forward()
-    #                 time.sleep(0.5)
-
-    #         time.sleep(0.5)
-
-    # except KeyboardInterrupt:
-    #     print("Exiting program...")
-    # finally:
-    #     GPIO.cleanup()
-
+    try:
+        while True:
+            if keyboard.is_pressed('up'):
+                move_forward()
+            elif keyboard.is_pressed('down'):
+                move_backward()
+            elif keyboard.is_pressed('left'):
+                turn_left()
+            elif keyboard.is_pressed('right'):
+                turn_right()
+            else:
+                stop_movement()
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()
