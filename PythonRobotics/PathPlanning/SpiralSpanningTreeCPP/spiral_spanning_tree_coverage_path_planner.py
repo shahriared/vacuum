@@ -4,8 +4,8 @@ import RPi.GPIO as GPIO
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
-MOTOR_2_PIN_1 = 16
-MOTOR_2_PIN_2 = 18
+MOTOR_2_PIN_1 = 32
+MOTOR_2_PIN_2 = 33
 
 # Ultrasonic sensor pins
 ULTRASONIC_LEFT_TRIGGER = 38
@@ -44,7 +44,6 @@ def move_forward():
     GPIO.output(MOTOR_2_PIN_1, True)
     GPIO.output(MOTOR_2_PIN_2, False)
     print("Moving forward")
-    time.sleep(2)  # Move forward for 2 seconds
 
 def move_backward():
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -104,34 +103,36 @@ def main():
     try:
         setup_gpio()
 
-        while True:
-            print("Starting distance measurement")
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        move_forward()
 
-            time.sleep(0.1)  # Sleep for 100 ms
+        # while True:
+        #     print("Starting distance measurement")
+        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-            print(f"Front: {front_distance} cm")
+        #     time.sleep(0.1)  # Sleep for 100 ms
 
-            last_turn = 'right'
+        #     print(f"Front: {front_distance} cm")
 
-            if front_distance < TOO_CLOSE_FRONT:
-                stop_motors()
-                if last_turn == 'right':
-                    turn_left()
-                    move_forward()
-                    time.sleep(2)
-                    turn_left()
-                    last_turn = 'left'
-                else:
-                    turn_right()
-                    move_forward()
-                    time.sleep(2)
-                    turn_right()
-                    last_turn = 'right'
+        #     last_turn = 'right'
+
+        #     if front_distance < TOO_CLOSE_FRONT:
+        #         stop_motors()
+        #         if last_turn == 'right':
+        #             turn_left()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_left()
+        #             last_turn = 'left'
+        #         else:
+        #             turn_right()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_right()
+        #             last_turn = 'right'
                
                 
-            else:
-                move_forward()  # Move forward normally
+        #     else:
+        #         move_forward()  # Move forward normally
 
     except KeyboardInterrupt:
         pass
