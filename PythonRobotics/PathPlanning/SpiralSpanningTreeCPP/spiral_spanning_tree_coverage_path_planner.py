@@ -117,7 +117,7 @@ def main():
         setup_pwm()
 
         while True:
-            move_forward(70)
+            move_forward(73)
             # Your additional code here
 
     except KeyboardInterrupt:
