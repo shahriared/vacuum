@@ -123,11 +123,11 @@ def main():
 
             print(f"Front: {front_distance} cm")
 
-            last_turn = 'right'
+            last_turn = 'none'
 
             if front_distance < TOO_CLOSE_FRONT:
                 stop_motors()
-                if last_turn == 'right':
+                if last_turn == 'right' or last_turn == 'none':
                     turn_left()
                     move_forward()
                     time.sleep(2)
