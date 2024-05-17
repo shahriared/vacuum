@@ -50,14 +50,14 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)  # Start with 0% duty cycle
     print("PWM setup complete")
 
-def move_forward(speed=100):
+def move_forward(speed=73):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
     print(f"Moving forward with speed {speed}%")
 
-def move_backward(speed=100):
+def move_backward(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -65,7 +65,7 @@ def move_backward(speed=100):
     print(f"Moving backward with speed {speed}%")
     time.sleep(2)  # Move backward for 2 seconds
 
-def turn_left(speed=100):
+def turn_left(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
@@ -73,7 +73,7 @@ def turn_left(speed=100):
     print(f"Turning left with speed {speed}%")
     time.sleep(TURNING_TIME)  # Rotate left for 90 degrees
 
-def turn_right(speed=100):
+def turn_right(speed=73):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -117,9 +117,30 @@ def main():
         setup_pwm()
 
         while True:
-            move_forward(73)
-            # Your additional code here
+            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
+            time.sleep(0.1)  # Sleep for 100 ms
+
+            print(f"Front: {front_distance} cm")
+
+            last_turn = 'right'
+
+            if front_distance < TOO_CLOSE_FRONT:
+                stop_motors()
+                if last_turn == 'right':
+                    turn_left()
+                    move_forward()
+                    time.sleep(1)
+                    turn_left()
+                    last_turn = 'left'
+                else:
+                    turn_right()
+                    move_forward()
+                    time.sleep(1)
+                    turn_right()
+                    last_turn = 'right'
+            else:
+                move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
     finally:
