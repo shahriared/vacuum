@@ -4,8 +4,8 @@ import RPi.GPIO as GPIO
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
-MOTOR_2_PIN_1 = 16
-MOTOR_2_PIN_2 = 18
+MOTOR_2_PIN_1 = 32
+MOTOR_2_PIN_2 = 33
 
 # Ultrasonic sensor pins
 ULTRASONIC_LEFT_TRIGGER = 38
@@ -40,8 +40,8 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
-    motor_pwm_1 = GPIO.PWM(MOTOR_1_PIN_1, 100)  # 100 Hz frequency
-    motor_pwm_2 = GPIO.PWM(MOTOR_2_PIN_1, 100)
+    motor_pwm_1 = GPIO.PWM(MOTOR_2_PIN_1, 100)  # 100 Hz frequency
+    motor_pwm_2 = GPIO.PWM(MOTOR_2_PIN_2, 100)
     motor_pwm_1.start(0)  # Start with 0% duty cycle (stopped)
     motor_pwm_2.start(0)
     print("GPIO setup complete")
