@@ -24,7 +24,7 @@ TOO_CLOSE_FRONT = 10.0
 TURNING_TIME = 2.24
 
 # PWM frequency
-PWM_FREQ = 800  # 1 kHz
+PWM_FREQ = 1000  # 1 kHz
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
@@ -117,7 +117,7 @@ def main():
         setup_pwm()
 
         while True:
-            move_forward()
+            move_forward(90)
             # Your additional code here
 
     except KeyboardInterrupt:
