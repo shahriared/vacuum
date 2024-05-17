@@ -103,36 +103,37 @@ def main():
     try:
         setup_gpio()
 
-        move_forward()
+        
 
-        # while True:
-        #     print("Starting distance measurement")
-        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        while True:
+            move_forward()
+            # print("Starting distance measurement")
+            # front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-        #     time.sleep(0.1)  # Sleep for 100 ms
+            # time.sleep(0.1)  # Sleep for 100 ms
 
-        #     print(f"Front: {front_distance} cm")
+            # print(f"Front: {front_distance} cm")
 
-        #     last_turn = 'right'
+            # last_turn = 'right'
 
-        #     if front_distance < TOO_CLOSE_FRONT:
-        #         stop_motors()
-        #         if last_turn == 'right':
-        #             turn_left()
-        #             move_forward()
-        #             time.sleep(2)
-        #             turn_left()
-        #             last_turn = 'left'
-        #         else:
-        #             turn_right()
-        #             move_forward()
-        #             time.sleep(2)
-        #             turn_right()
-        #             last_turn = 'right'
+            # if front_distance < TOO_CLOSE_FRONT:
+            #     stop_motors()
+            #     if last_turn == 'right':
+            #         turn_left()
+            #         move_forward()
+            #         time.sleep(2)
+            #         turn_left()
+            #         last_turn = 'left'
+            #     else:
+            #         turn_right()
+            #         move_forward()
+            #         time.sleep(2)
+            #         turn_right()
+            #         last_turn = 'right'
                
                 
-        #     else:
-        #         move_forward()  # Move forward normally
+            # else:
+            #     move_forward()  # Move forward normally
 
     except KeyboardInterrupt:
         pass
