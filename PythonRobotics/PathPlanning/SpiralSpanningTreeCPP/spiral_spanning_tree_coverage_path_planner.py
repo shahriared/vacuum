@@ -130,13 +130,13 @@ def main():
                 if last_turn == 'right':
                     turn_left()
                     move_forward()
-                    time.sleep(1)
+                    time.sleep(2)
                     turn_left()
                     last_turn = 'left'
                 else:
                     turn_right()
                     move_forward()
-                    time.sleep(1)
+                    time.sleep(2)
                     turn_right()
                     last_turn = 'right'
             else:
