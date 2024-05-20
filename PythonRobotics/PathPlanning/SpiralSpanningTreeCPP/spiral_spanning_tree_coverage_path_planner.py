@@ -82,10 +82,10 @@ def turn_right(speed=100):
     time.sleep(TURNING_TIME)  # Rotate right for 90 degrees
 
 def stop_motors():
-    GPIO.output(MOTOR_1_PIN_1, False)
-    GPIO.output(MOTOR_1_PIN_2, False)
-    pwm_motor_2_pin_1.ChangeDutyCycle(0)
-    pwm_motor_2_pin_2.ChangeDutyCycle(0)
+    # GPIO.output(MOTOR_1_PIN_1, False)
+    # GPIO.output(MOTOR_1_PIN_2, False)
+    # pwm_motor_2_pin_1.ChangeDutyCycle(0)
+    # pwm_motor_2_pin_2.ChangeDutyCycle(0)
     print("Motors stopped")
 
 def get_distance(trigger_pin, echo_pin):
