@@ -116,6 +116,8 @@ def main():
         setup_gpio()
         setup_pwm()
 
+        last_turn = 'right'
+
         while True:
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
@@ -123,11 +125,9 @@ def main():
 
             print(f"Front: {front_distance} cm")
 
-            last_turn = 'none'
-
             if front_distance < TOO_CLOSE_FRONT:
                 stop_motors()
-                if last_turn == 'right' or last_turn == 'none':
+                if last_turn == 'right':
                     turn_left()
                     move_forward()
                     time.sleep(2)
