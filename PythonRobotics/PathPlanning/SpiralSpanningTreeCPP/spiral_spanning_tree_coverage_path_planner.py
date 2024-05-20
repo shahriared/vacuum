@@ -50,14 +50,14 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)  # Start with 0% duty cycle
     print("PWM setup complete")
 
-def move_forward(speed=73):
+def move_forward(speed=100):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
     print(f"Moving forward with speed {speed}%")
 
-def move_backward(speed=73):
+def move_backward(speed=100):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -65,7 +65,7 @@ def move_backward(speed=73):
     print(f"Moving backward with speed {speed}%")
     time.sleep(2)  # Move backward for 2 seconds
 
-def turn_left(speed=73):
+def turn_left(speed=100):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
@@ -73,7 +73,7 @@ def turn_left(speed=73):
     print(f"Turning left with speed {speed}%")
     time.sleep(TURNING_TIME)  # Rotate left for 90 degrees
 
-def turn_right(speed=73):
+def turn_right(speed=100):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
