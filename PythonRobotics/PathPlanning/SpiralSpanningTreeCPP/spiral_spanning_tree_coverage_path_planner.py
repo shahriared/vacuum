@@ -4,10 +4,8 @@ import RPi.GPIO as GPIO
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
-# MOTOR_2_PIN_1 = 38
-# MOTOR_2_PIN_2 = 40
-MOTOR_2_PIN_1 = 32
-MOTOR_2_PIN_2 = 36
+MOTOR_2_PIN_1 = 12
+MOTOR_2_PIN_2 = 35
 
 # Ultrasonic sensor pins
 ULTRASONIC_LEFT_TRIGGER = 38
@@ -33,10 +31,10 @@ def setup_gpio():
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-    # GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
-    # GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
-    # GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
-    # GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
+    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
+    GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -47,48 +45,47 @@ def cleanup_gpio():
 def setup_pwm():
     global pwm_motor_2_pin_1, pwm_motor_2_pin_2
     pwm_motor_2_pin_1 = GPIO.PWM(MOTOR_2_PIN_1, PWM_FREQ)
-    # pwm_motor_2_pin_2 = GPIO.PWM(MOTOR_2_PIN_2, PWM_FREQ)
+    pwm_motor_2_pin_2 = GPIO.PWM(MOTOR_2_PIN_2, PWM_FREQ)
     pwm_motor_2_pin_1.start(0)  # Start with 0% duty cycle
-    # pwm_motor_2_pin_2.start(0)  # Start with 0% duty cycle
+    pwm_motor_2_pin_2.start(0)  # Start with 0% duty cycle
     print("PWM setup complete")
 
-def move_forward(speed=100):
+def move_forward(speed=73):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
-    # pwm_motor_2_pin_2.ChangeDutyCycle(0)
-    GPIO.output(MOTOR_2_PIN_2, False)
+    pwm_motor_2_pin_2.ChangeDutyCycle(0)
     print(f"Moving forward with speed {speed}%")
 
-def move_backward(speed=100):
+def move_backward(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
-    # pwm_motor_2_pin_2.ChangeDutyCycle(speed)
+    pwm_motor_2_pin_2.ChangeDutyCycle(speed)
     print(f"Moving backward with speed {speed}%")
     time.sleep(2)  # Move backward for 2 seconds
 
-def turn_left(speed=100):
+def turn_left(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
-    # pwm_motor_2_pin_2.ChangeDutyCycle(0)
+    pwm_motor_2_pin_2.ChangeDutyCycle(0)
     print(f"Turning left with speed {speed}%")
     time.sleep(TURNING_TIME)  # Rotate left for 90 degrees
 
-def turn_right(speed=100):
+def turn_right(speed=73):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
-    # pwm_motor_2_pin_2.ChangeDutyCycle(speed)
+    pwm_motor_2_pin_2.ChangeDutyCycle(speed)
     print(f"Turning right with speed {speed}%")
     time.sleep(TURNING_TIME)  # Rotate right for 90 degrees
 
 def stop_motors():
-    # GPIO.output(MOTOR_1_PIN_1, False)
-    # GPIO.output(MOTOR_1_PIN_2, False)
-    # pwm_motor_2_pin_1.ChangeDutyCycle(0)
-    # pwm_motor_2_pin_2.ChangeDutyCycle(0)
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    pwm_motor_2_pin_1.ChangeDutyCycle(0)
+    pwm_motor_2_pin_2.ChangeDutyCycle(0)
     print("Motors stopped")
 
 def get_distance(trigger_pin, echo_pin):
@@ -116,58 +113,39 @@ def get_distance(trigger_pin, echo_pin):
 
 def main():
     try:
-        # GPIO.setmode(GPIO.BOARD)
-        # GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
-        # GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
-        # GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-
-        # GPIO.output(MOTOR_1_PIN_1, True)
-        # GPIO.output(MOTOR_1_PIN_2, False)
-        # GPIO.output(MOTOR_2_PIN_1, True)
-        # GPIO.output(MOTOR_2_PIN_2, False)
         setup_gpio()
         setup_pwm()
-        move_forward()
-        time.sleep(20)
+
+        while True:
+            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+
+            time.sleep(0.1)  # Sleep for 100 ms
+
+            print(f"Front: {front_distance} cm")
+
+            last_turn = 'none'
+
+            if front_distance < TOO_CLOSE_FRONT:
+                stop_motors()
+                if last_turn == 'right' or last_turn == 'none':
+                    turn_left()
+                    move_forward()
+                    time.sleep(2)
+                    turn_left()
+                    last_turn = 'left'
+                else:
+                    turn_right()
+                    move_forward()
+                    time.sleep(2)
+                    turn_right()
+                    last_turn = 'right'
+            else:
+                move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
     finally:
         stop_motors()
         cleanup_gpio()
-    # setup_gpio()
-    # setup_pwm()
-    # move_forward()
-    # time.sleep(20)
-        # while True:
-        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-
-        #     time.sleep(0.1)  # Sleep for 100 ms
-
-        #     print(f"Front: {front_distance} cm")
-
-        #     last_turn = 'none'
-
-        #     if front_distance < TOO_CLOSE_FRONT:
-        #         stop_motors()
-        #         if last_turn == 'right' or last_turn == 'none':
-        #             turn_left()
-        #             move_forward()
-        #             time.sleep(2)
-        #             turn_left()
-        #             last_turn = 'left'
-        #         else:
-        #             turn_right()
-        #             move_forward()
-        #             time.sleep(2)
-        #             turn_right()
-        #             last_turn = 'right'
-        #     else:
-        #         move_forward()  # Move forward normally
-    # except KeyboardInterrupt:
-    #     pass
-    # finally:
-    #     stop_motors()
-    #     cleanup_gpio()
 
 if __name__ == "__main__":
     main()
