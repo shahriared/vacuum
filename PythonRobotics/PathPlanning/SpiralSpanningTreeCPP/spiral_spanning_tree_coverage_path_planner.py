@@ -122,6 +122,8 @@ def main():
         GPIO.output(MOTOR_1_PIN_2, False)
         GPIO.output(MOTOR_2_PIN_1, True)
         GPIO.output(MOTOR_2_PIN_2, False)
+
+        time.sleep(20)
     except KeyboardInterrupt:
         pass
     finally:
