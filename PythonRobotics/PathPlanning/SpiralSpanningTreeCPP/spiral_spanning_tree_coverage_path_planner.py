@@ -4,10 +4,10 @@ import RPi.GPIO as GPIO
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
 MOTOR_1_PIN_2 = 13
-# MOTOR_2_PIN_1 = 38
-# MOTOR_2_PIN_2 = 40
-MOTOR_2_PIN_1 = 32
-MOTOR_2_PIN_2 = 33
+MOTOR_2_PIN_1 = 38
+MOTOR_2_PIN_2 = 40
+#MOTOR_2_PIN_1 = 32
+#MOTOR_2_PIN_2 = 33
 
 # Ultrasonic sensor pins
 ULTRASONIC_LEFT_TRIGGER = 38
