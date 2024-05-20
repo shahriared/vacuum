@@ -112,40 +112,40 @@ def get_distance(trigger_pin, echo_pin):
     return distance
 
 def main():
-    try:
-        setup_gpio()
-        setup_pwm()
+    # try:
+    setup_gpio()
+    setup_pwm()
+    move_forward()
+        # while True:
+        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-        while True:
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        #     time.sleep(0.1)  # Sleep for 100 ms
 
-            time.sleep(0.1)  # Sleep for 100 ms
+        #     print(f"Front: {front_distance} cm")
 
-            print(f"Front: {front_distance} cm")
+        #     last_turn = 'none'
 
-            last_turn = 'none'
-
-            if front_distance < TOO_CLOSE_FRONT:
-                stop_motors()
-                if last_turn == 'right' or last_turn == 'none':
-                    turn_left()
-                    move_forward()
-                    time.sleep(2)
-                    turn_left()
-                    last_turn = 'left'
-                else:
-                    turn_right()
-                    move_forward()
-                    time.sleep(2)
-                    turn_right()
-                    last_turn = 'right'
-            else:
-                move_forward()  # Move forward normally
-    except KeyboardInterrupt:
-        pass
-    finally:
-        stop_motors()
-        cleanup_gpio()
+        #     if front_distance < TOO_CLOSE_FRONT:
+        #         stop_motors()
+        #         if last_turn == 'right' or last_turn == 'none':
+        #             turn_left()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_left()
+        #             last_turn = 'left'
+        #         else:
+        #             turn_right()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_right()
+        #             last_turn = 'right'
+        #     else:
+        #         move_forward()  # Move forward normally
+    # except KeyboardInterrupt:
+    #     pass
+    # finally:
+    #     stop_motors()
+    #     cleanup_gpio()
 
 if __name__ == "__main__":
     main()
