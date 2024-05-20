@@ -113,10 +113,19 @@ def get_distance(trigger_pin, echo_pin):
 
 def main():
     # try:
-    setup_gpio()
-    setup_pwm()
-    move_forward()
-    time.sleep(20)
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
+    GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
+
+    GPIO.output(MOTOR_1_PIN_1, True)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    GPIO.output(MOTOR_2_PIN_1, True)
+    GPIO.output(MOTOR_2_PIN_2, False)
+    # setup_gpio()
+    # setup_pwm()
+    # move_forward()
+    # time.sleep(20)
         # while True:
         #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
