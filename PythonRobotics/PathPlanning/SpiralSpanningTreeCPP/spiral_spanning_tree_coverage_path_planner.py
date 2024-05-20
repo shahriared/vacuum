@@ -116,6 +116,7 @@ def main():
     setup_gpio()
     setup_pwm()
     move_forward()
+    time.sleep(20)
         # while True:
         #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
