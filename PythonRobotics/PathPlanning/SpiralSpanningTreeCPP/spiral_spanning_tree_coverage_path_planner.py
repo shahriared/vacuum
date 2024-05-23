@@ -15,6 +15,8 @@ ULTRASONIC_FRONT_ECHO = 3
 ULTRASONIC_RIGHT_TRIGGER = 23
 ULTRASONIC_RIGHT_ECHO = 21
 
+LIMIT_SWITCH_PIN = 7
+
 # Threshold distances in centimeters
 TOO_CLOSE_WALL = 18.0
 TOO_FAR_WALL = 25.0
@@ -35,6 +37,7 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
+    GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -116,34 +119,41 @@ def main():
         setup_gpio()
         setup_pwm()
 
+        while True:
+            limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
+            if limit_switch_state == 1:
+                move_backward()
+            else 
+                move_forward()
+
         # move_backward()
         # time.sleep(2000)
 
-        last_turn = 'right'
+        # last_turn = 'right'
 
-        while True:
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        # while True:
+        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-            time.sleep(0.1)  # Sleep for 100 ms
+        #     time.sleep(0.1)  # Sleep for 100 ms
 
-            print(f"Front: {front_distance} cm")
+        #     print(f"Front: {front_distance} cm")
 
-            if front_distance < TOO_CLOSE_FRONT:
-                stop_motors()
-                if last_turn == 'right':
-                    turn_left()
-                    move_forward()
-                    time.sleep(2)
-                    turn_left()
-                    last_turn = 'left'
-                else:
-                    turn_right()
-                    move_forward()
-                    time.sleep(2)
-                    turn_right()
-                    last_turn = 'right'
-            else:
-                move_forward()  # Move forward normally
+        #     if front_distance < TOO_CLOSE_FRONT:
+        #         stop_motors()
+        #         if last_turn == 'right':
+        #             turn_left()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_left()
+        #             last_turn = 'left'
+        #         else:
+        #             turn_right()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_right()
+        #             last_turn = 'right'
+        #     else:
+        #         move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
     finally:
