@@ -58,11 +58,11 @@ def move_forward(speed=73):
     print(f"Moving forward with speed {speed}%")
 
 def move_backward(speed=73):
-    # GPIO.output(MOTOR_1_PIN_1, False)
-    # GPIO.output(MOTOR_1_PIN_2, True)
-    pwm_motor_2_pin_1.ChangeDutyCycle(0)
-    pwm_motor_2_pin_2.ChangeDutyCycle(speed)
-    print(f"Moving backward with speed {speed}%")
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, True)
+    # pwm_motor_2_pin_1.ChangeDutyCycle(0)
+    # pwm_motor_2_pin_2.ChangeDutyCycle(speed)
+    # print(f"Moving backward with speed {speed}%")
     time.sleep(2)  # Move backward for 2 seconds
 
 def turn_left(speed=73):
