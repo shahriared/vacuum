@@ -123,6 +123,8 @@ def main():
         while True:
             limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
             if limit_switch_state == 1:
+                move_backward()
+                time.sleep(1)
                 turn_left()
                 turn_left()
             else:
