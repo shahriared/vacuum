@@ -23,7 +23,7 @@ TOO_FAR_WALL = 25.0
 TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
-TURNING_TIME = 2.5
+TURNING_TIME = 2.6
 
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
@@ -66,7 +66,6 @@ def move_backward(speed=73):
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
     # print(f"Moving backward with speed {speed}%")
-    time.sleep(2)  # Move backward for 2 seconds
 
 def turn_left(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
