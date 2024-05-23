@@ -117,6 +117,7 @@ def main():
         setup_pwm()
 
         move_backward()
+        time.sleep(2000)
 
         # last_turn = 'right'
 
