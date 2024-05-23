@@ -117,42 +117,37 @@ def main():
     try:
         setup_gpio()
         setup_pwm()
+            
+        last_turn = 'right'
 
         while True:
             limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
             if limit_switch_state == 1:
-                move_backward()
+                turn_left()
+                turn_left()
             else:
-                move_forward()
+                front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-        # move_backward()
-        # time.sleep(2000)
+                time.sleep(0.1)  # Sleep for 100 ms
 
-        # last_turn = 'right'
+                print(f"Front: {front_distance} cm")
 
-        # while True:
-        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-
-        #     time.sleep(0.1)  # Sleep for 100 ms
-
-        #     print(f"Front: {front_distance} cm")
-
-        #     if front_distance < TOO_CLOSE_FRONT:
-        #         stop_motors()
-        #         if last_turn == 'right':
-        #             turn_left()
-        #             move_forward()
-        #             time.sleep(2)
-        #             turn_left()
-        #             last_turn = 'left'
-        #         else:
-        #             turn_right()
-        #             move_forward()
-        #             time.sleep(2)
-        #             turn_right()
-        #             last_turn = 'right'
-        #     else:
-        #         move_forward()  # Move forward normally
+                if front_distance < TOO_CLOSE_FRONT:
+                    stop_motors()
+                    if last_turn == 'right':
+                        turn_left()
+                        move_forward()
+                        time.sleep(2)
+                        turn_left()
+                        last_turn = 'left'
+                    else:
+                        turn_right()
+                        move_forward()
+                        time.sleep(2)
+                        turn_right()
+                        last_turn = 'right'
+                else:
+                    move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
     finally:
