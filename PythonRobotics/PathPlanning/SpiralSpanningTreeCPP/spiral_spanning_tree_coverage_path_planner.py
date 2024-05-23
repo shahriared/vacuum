@@ -123,7 +123,7 @@ def main():
             limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
             if limit_switch_state == 1:
                 move_backward()
-            else 
+            else:
                 move_forward()
 
         # move_backward()
