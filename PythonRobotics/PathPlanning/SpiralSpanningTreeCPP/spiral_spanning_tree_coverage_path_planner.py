@@ -116,31 +116,33 @@ def main():
         setup_gpio()
         setup_pwm()
 
-        last_turn = 'right'
+        move_backward()
 
-        while True:
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+        # last_turn = 'right'
 
-            time.sleep(0.1)  # Sleep for 100 ms
+        # while True:
+        #     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-            print(f"Front: {front_distance} cm")
+        #     time.sleep(0.1)  # Sleep for 100 ms
 
-            if front_distance < TOO_CLOSE_FRONT:
-                stop_motors()
-                if last_turn == 'right':
-                    turn_left()
-                    move_forward()
-                    time.sleep(2)
-                    turn_left()
-                    last_turn = 'left'
-                else:
-                    turn_right()
-                    move_forward()
-                    time.sleep(2)
-                    turn_right()
-                    last_turn = 'right'
-            else:
-                move_forward()  # Move forward normally
+        #     print(f"Front: {front_distance} cm")
+
+        #     if front_distance < TOO_CLOSE_FRONT:
+        #         stop_motors()
+        #         if last_turn == 'right':
+        #             turn_left()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_left()
+        #             last_turn = 'left'
+        #         else:
+        #             turn_right()
+        #             move_forward()
+        #             time.sleep(2)
+        #             turn_right()
+        #             last_turn = 'right'
+        #     else:
+        #         move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
     finally:
