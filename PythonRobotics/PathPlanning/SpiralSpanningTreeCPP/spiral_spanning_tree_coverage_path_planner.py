@@ -17,6 +17,8 @@ ULTRASONIC_RIGHT_ECHO = 21
 
 LIMIT_SWITCH_PIN = 7
 
+FAN_PIN = 8
+
 # Threshold distances in centimeters
 TOO_CLOSE_WALL = 18.0
 TOO_FAR_WALL = 25.0
@@ -30,14 +32,22 @@ PWM_FREQ = 1000  # 1 kHz
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
+
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
+
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
+
     GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
+
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
+
     GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
+
+    GPIO.setup(FAN_PIN, GPIO.OUT)
+
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -113,10 +123,16 @@ def get_distance(trigger_pin, echo_pin):
     distance = round(distance, 2)
     return distance
 
+def turn_fan_on():
+    GPIO.output(FAN_PIN, True)
+    print("Fan turned on")
+
 def main():
     try:
         setup_gpio()
         setup_pwm()
+
+        turn_fan_on()
             
         last_turn = 'right'
 
