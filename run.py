@@ -119,16 +119,11 @@ def get_distance(trigger_pin, echo_pin):
     return distance
 
 def turn_fan_on():
-    GPIO.output(FAN_PIN, True)
+    GPIO.output(FAN_PIN, False)
     print("Fan turned on")
 
 def automatic_mode():
-    try:
-        setup_gpio()
-        setup_pwm()
-
-        turn_fan_on()
-            
+    try:            
         last_turn = 'right'
 
         while True:
@@ -197,6 +192,8 @@ def main():
     try:
         setup_gpio()
         setup_pwm()
+
+        turn_fan_on()
 
         if args.control_with_keyboard:
             keyboard_control()
