@@ -1,5 +1,7 @@
 import time
 import RPi.GPIO as GPIO
+import keyboard
+import argparse
 
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
@@ -68,37 +70,30 @@ def move_forward(speed=73):
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
-    print(f"Moving forward with speed {speed}%")
 
 def move_backward(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
-    # print(f"Moving backward with speed {speed}%")
 
 def turn_left(speed=73):
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
-    print(f"Turning left with speed {speed}%")
-    time.sleep(TURNING_TIME)  # Rotate left for 90 degrees
 
 def turn_right(speed=73):
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
-    print(f"Turning right with speed {speed}%")
-    time.sleep(TURNING_TIME)  # Rotate right for 90 degrees
 
 def stop_motors():
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
-    print("Motors stopped")
 
 def get_distance(trigger_pin, echo_pin):
     GPIO.output(trigger_pin, True)
@@ -127,7 +122,7 @@ def turn_fan_on():
     GPIO.output(FAN_PIN, True)
     print("Fan turned on")
 
-def main():
+def automatic_mode():
     try:
         setup_gpio()
         setup_pwm()
@@ -142,32 +137,71 @@ def main():
                 move_backward()
                 time.sleep(1)
                 turn_left()
+                time.sleep(TURNING_TIME)
                 turn_left()
+                time.sleep(TURNING_TIME)
             else:
                 front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-                time.sleep(0.1)  # Sleep for 100 ms
-
-                print(f"Front: {front_distance} cm")
+                time.sleep(0.1)
 
                 if front_distance < TOO_CLOSE_FRONT:
                     stop_motors()
                     if last_turn == 'right':
                         turn_left()
+                        time.sleep(TURNING_TIME)
                         move_forward()
                         time.sleep(2)
                         turn_left()
+                        time.sleep(TURNING_TIME)
                         last_turn = 'left'
                     else:
                         turn_right()
+                        time.sleep(TURNING_TIME)
                         move_forward()
                         time.sleep(2)
                         turn_right()
+                        time.sleep(TURNING_TIME)
                         last_turn = 'right'
                 else:
                     move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
+    finally:
+        stop_motors()
+        cleanup_gpio()
+
+def keyboard_control():
+    print("Keyboard control mode. Use arrow keys to control the robot and space to stop.")
+    try:
+        while True:
+            if keyboard.is_pressed('up'):
+                move_forward()
+            elif keyboard.is_pressed('down'):
+                move_backward()
+            elif keyboard.is_pressed('left'):
+                turn_left()
+            elif keyboard.is_pressed('right'):
+                turn_right()
+            elif keyboard.is_pressed('space'):
+                stop_motors()
+            time.sleep(0.1)  # Small delay to prevent high CPU usage
+    except KeyboardInterrupt:
+        pass
+
+def main():
+    parser = argparse.ArgumentParser(description='Robot control script.')
+    parser.add_argument('--control-with-keyboard', action='store_true', help='Control the robot with the keyboard')
+    args = parser.parse_args()
+
+    try:
+        setup_gpio()
+        setup_pwm()
+
+        if args.control_with_keyboard:
+            keyboard_control()
+        else:
+            automatic_mode()
     finally:
         stop_motors()
         cleanup_gpio()
