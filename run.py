@@ -1,7 +1,7 @@
 import time
 import RPi.GPIO as GPIO
-import keyboard
 import argparse
+from pynput import keyboard
 
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
@@ -34,29 +34,21 @@ PWM_FREQ = 1000  # 1 kHz
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
-
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
-
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-
     GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
-
     GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
-
     GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
-
     GPIO.setup(FAN_PIN, GPIO.OUT)
-
     print("GPIO setup complete")
 
 def cleanup_gpio():
     GPIO.cleanup()
     print("GPIO cleaned up")
 
-# Create PWM instances for MOTOR_2 pins
 def setup_pwm():
     global pwm_motor_2_pin_1, pwm_motor_2_pin_2
     pwm_motor_2_pin_1 = GPIO.PWM(MOTOR_2_PIN_1, PWM_FREQ)
@@ -119,7 +111,7 @@ def get_distance(trigger_pin, echo_pin):
     return distance
 
 def turn_fan_on():
-    GPIO.output(FAN_PIN, False)
+    GPIO.output(FAN_PIN, True)
     print("Fan turned on")
 
 def automatic_mode():
@@ -166,20 +158,47 @@ def automatic_mode():
         stop_motors()
         cleanup_gpio()
 
+class KeyboardController:
+    def __init__(self):
+        self.listener = keyboard.Listener(
+            on_press=self.on_press,
+            on_release=self.on_release
+        )
+        self.listener.start()
+        self.current_action = None
+
+    def on_press(self, key):
+        try:
+            if key.char == ' ':
+                self.stop()
+        except AttributeError:
+            if key == keyboard.Key.up:
+                self.current_action = move_forward
+                self.current_action()
+            elif key == keyboard.Key.down:
+                self.current_action = move_backward
+                self.current_action()
+            elif key == keyboard.Key.left:
+                self.current_action = turn_left
+                self.current_action()
+            elif key == keyboard.Key.right:
+                self.current_action = turn_right
+                self.current_action()
+
+    def on_release(self, key):
+        if key in (keyboard.Key.up, keyboard.Key.down, keyboard.Key.left, keyboard.Key.right):
+            self.stop()
+
+    def stop(self):
+        if self.current_action:
+            stop_motors()
+            self.current_action = None
+
 def keyboard_control():
     print("Keyboard control mode. Use arrow keys to control the robot and space to stop.")
+    controller = KeyboardController()
     try:
         while True:
-            if keyboard.is_pressed('up'):
-                move_forward()
-            elif keyboard.is_pressed('down'):
-                move_backward()
-            elif keyboard.is_pressed('left'):
-                turn_left()
-            elif keyboard.is_pressed('right'):
-                turn_right()
-            elif keyboard.is_pressed('space'):
-                stop_motors()
             time.sleep(0.1)
     except KeyboardInterrupt:
         pass
