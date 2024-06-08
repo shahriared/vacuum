@@ -4,8 +4,8 @@ import argparse
 import keyboard
 
 # Constants for motor pins
-MOTOR_1_PIN_1 = 11
-MOTOR_1_PIN_2 = 13
+MOTOR_1_PIN_1 = 13
+MOTOR_1_PIN_2 = 11
 MOTOR_2_PIN_1 = 12
 MOTOR_2_PIN_2 = 35
 
