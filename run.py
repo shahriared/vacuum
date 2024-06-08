@@ -1,7 +1,7 @@
 import time
 import RPi.GPIO as GPIO
 import argparse
-from pynput import keyboard
+import keyboard
 
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
@@ -10,12 +10,12 @@ MOTOR_2_PIN_1 = 12
 MOTOR_2_PIN_2 = 35
 
 # Ultrasonic sensor pins
-ULTRASONIC_LEFT_TRIGGER = 38
-ULTRASONIC_LEFT_ECHO = 40
+# ULTRASONIC_LEFT_TRIGGER = 38
+# ULTRASONIC_LEFT_ECHO = 40
 ULTRASONIC_FRONT_TRIGGER = 5
 ULTRASONIC_FRONT_ECHO = 3
-ULTRASONIC_RIGHT_TRIGGER = 23
-ULTRASONIC_RIGHT_ECHO = 21
+# ULTRASONIC_RIGHT_TRIGGER = 23
+# ULTRASONIC_RIGHT_ECHO = 21
 
 LIMIT_SWITCH_PIN = 7
 
@@ -160,67 +160,23 @@ def automatic_mode():
 
 class KeyboardController:
     def __init__(self):
-        self.listener = keyboard.Listener(
-            on_press=self.on_press,
-            on_release=self.on_release
-        )
-        self.listener.start()
         self.current_action = None
 
-    def on_press(self, key):
-        try:
-            if key.char == ' ':
-                self.stop()
-        except AttributeError:
-            if key == keyboard.Key.up:
-                self.current_action = move_forward
-                self.current_action()
-            elif key == keyboard.Key.down:
-                self.current_action = move_backward
-                self.current_action()
-            elif key == keyboard.Key.left:
-                self.current_action = turn_left
-                self.current_action()
-            elif key == keyboard.Key.right:
-                self.current_action = turn_right
-                self.current_action()
-
-    def on_release(self, key):
-        if key in (keyboard.Key.up, keyboard.Key.down, keyboard.Key.left, keyboard.Key.right):
+    def handle_key_press(self, event):
+        key = event.name
+        if key == 'up':
+            self.current_action = move_forward
+        elif key == 'down':
+            self.current_action = move_backward
+        elif key == 'left':
+            self.current_action = turn_left
+        elif key == 'right':
+            self.current_action = turn_right
+        elif key == 'space':
             self.stop()
 
-    def stop(self):
         if self.current_action:
-            stop_motors()
-            self.current_action = None
+            self.current_action()
 
-def keyboard_control():
-    print("Keyboard control mode. Use arrow keys to control the robot and space to stop.")
-    controller = KeyboardController()
-    try:
-        while True:
-            time.sleep(0.1)
-    except KeyboardInterrupt:
-        pass
-
-def main():
-    parser = argparse.ArgumentParser(description='Robot control script.')
-    parser.add_argument('--control-with-keyboard', action='store_true', help='Control the robot with the keyboard')
-    args = parser.parse_args()
-
-    try:
-        setup_gpio()
-        setup_pwm()
-
-        turn_fan_on()
-
-        if args.control_with_keyboard:
-            keyboard_control()
-        else:
-            automatic_mode()
-    finally:
-        stop_motors()
-        cleanup_gpio()
-
-if __name__ == "__main__":
-    main()
+    def handle_key_release(self, event):
+        self.stop
