@@ -27,7 +27,7 @@ TOO_FAR_WALL = 25.0
 TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
-TURNING_TIME = 2.6
+TURNING_TIME = 3
 
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
