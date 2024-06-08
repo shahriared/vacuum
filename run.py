@@ -37,10 +37,6 @@ def setup_gpio():
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-    GPIO.setup(ULTRASONIC_LEFT_TRIGGER, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_LEFT_ECHO, GPIO.IN)
-    GPIO.setup(ULTRASONIC_RIGHT_TRIGGER, GPIO.OUT)
-    GPIO.setup(ULTRASONIC_RIGHT_ECHO, GPIO.IN)
     GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
     GPIO.setup(FAN_PIN, GPIO.OUT)
     print("GPIO setup complete")
@@ -179,4 +175,22 @@ class KeyboardController:
             self.current_action()
 
     def handle_key_release(self, event):
-        self.stop
+        self.stop()
+
+def main():
+    setup_gpio()
+    setup_pwm()
+
+    controller = KeyboardController()
+    keyboard.on_press(controller.handle_key_press)
+    keyboard.on_release(controller.handle_key_release)
+
+    print("Press 'q' to quit")
+    while True:
+        if keyboard.is_pressed('q'):
+            break
+
+    cleanup_gpio()
+
+if __name__ == "__main__":
+    main()
