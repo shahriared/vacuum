@@ -154,41 +154,11 @@ def automatic_mode():
         stop_motors()
         cleanup_gpio()
 
-class KeyboardController:
-    def __init__(self):
-        self.current_action = None
-
-    def handle_key_press(self, event):
-        key = event.name
-        if key == 'up':
-            self.current_action = move_forward
-        elif key == 'down':
-            self.current_action = move_backward
-        elif key == 'left':
-            self.current_action = turn_left
-        elif key == 'right':
-            self.current_action = turn_right
-        elif key == 'space':
-            self.stop()
-
-        if self.current_action:
-            self.current_action()
-
-    def handle_key_release(self, event):
-        self.stop()
-
 def main():
     setup_gpio()
     setup_pwm()
 
-    controller = KeyboardController()
-    keyboard.on_press(controller.handle_key_press)
-    keyboard.on_release(controller.handle_key_release)
-
-    print("Press 'q' to quit")
-    while True:
-        if keyboard.is_pressed('q'):
-            break
+    automatic_mode()
 
     cleanup_gpio()
 
