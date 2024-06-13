@@ -25,6 +25,7 @@ LIMIT_SWITCH_PIN_2 = 15
 
 # Threshold distances in centimeters
 TOO_CLOSE_WALL = 18.0
+IDEAL_WALL_DISTANCE = 20.0
 TOO_FAR_WALL = 25.0
 TOO_CLOSE_FRONT = 10.0
 
@@ -117,13 +118,13 @@ def get_distance(trigger_pin, echo_pin):
 #     GPIO.output(FAN_PIN, True)
 #     print("Fan turned on")
 
-
 def main():
     setup_gpio()
     setup_pwm()
 
     try:            
         last_turn = 'right'
+        wall_following = False
 
         while True:
             limit_switch_state_1 = GPIO.input(LIMIT_SWITCH_PIN_1)
@@ -160,18 +161,27 @@ def main():
                         turn_right()
                         time.sleep(TURNING_TIME)
                         last_turn = 'right'
-                elif left_distance < TOO_CLOSE_WALL:
-                    stop_motors()
-                    turn_right()
-                    time.sleep(TURNING_TIME)
-                    last_turn = 'right'
-                elif right_distance < TOO_CLOSE_WALL:
-                    stop_motors()
-                    turn_left()
-                    time.sleep(TURNING_TIME)
-                    last_turn = 'left'
-                else:
-                    move_forward()  # Move forward normally
+                elif not wall_following:
+                    if left_distance < TOO_CLOSE_WALL:
+                        stop_motors()
+                        turn_right()
+                        time.sleep(TURNING_TIME)
+                        last_turn = 'right'
+                    elif left_distance > TOO_FAR_WALL:
+                        stop_motors()
+                        turn_left()
+                        time.sleep(TURNING_TIME)
+                        last_turn = 'left'
+                    elif TOO_CLOSE_WALL <= left_distance <= TOO_FAR_WALL:
+                        wall_following = True
+                        move_forward()
+                elif wall_following:
+                    if left_distance < TOO_CLOSE_WALL:
+                        turn_right()
+                    elif left_distance > TOO_FAR_WALL:
+                        turn_left()
+                    else:
+                        move_forward()
     except KeyboardInterrupt:
         pass
     finally:
