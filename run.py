@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 import numpy as np
 
 # Constants for motor pins
-MOTOR_1_PIN_1 = 13
+MOTOR_1_PIN_1 = 15
 MOTOR_1_PIN_2 = 11
 MOTOR_2_PIN_1 = 12
 MOTOR_2_PIN_2 = 35
