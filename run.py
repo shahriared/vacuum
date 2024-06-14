@@ -129,7 +129,15 @@ def main():
     setup_gpio()
     setup_pwm()
 
-    move_forward()
+    while True:
+        move_forward()
+        time.sleep(1)
+        turn_left()
+        time.sleep(1)
+        turn_right()
+        time.sleep(1)
+        stop_motors()
+    
 
     # current_x = 0
     # current_y = 0
