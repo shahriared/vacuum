@@ -138,10 +138,11 @@ def main():
     current_y = 0
     mark_cell_visited(current_x, current_y)
 
-    print(all_cells_visited())
+    print(not all_cells_visited())
 
     try:
         while not all_cells_visited():
+            print(f"Current position: ({current_x}, {current_y})")
             left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
             right_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_RIGHT)
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
