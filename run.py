@@ -138,6 +138,8 @@ def main():
     current_y = 0
     mark_cell_visited(current_x, current_y)
 
+    print(all_cells_visited())
+
     try:
         while not all_cells_visited():
             left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
