@@ -1,23 +1,23 @@
 import time
 import RPi.GPIO as GPIO
-import numpy as np
 
 # Constants for motor pins
-MOTOR_1_PIN_1 = 15
+MOTOR_1_PIN_1 = 13
 MOTOR_1_PIN_2 = 11
 MOTOR_2_PIN_1 = 12
 MOTOR_2_PIN_2 = 35
 
 # Ultrasonic sensor pins
-ULTRASONIC_LEFT_TRIGGER = 38
-ULTRASONIC_LEFT_ECHO = 40
+# ULTRASONIC_LEFT_TRIGGER = 38
+# ULTRASONIC_LEFT_ECHO = 40
 ULTRASONIC_FRONT_TRIGGER = 5
 ULTRASONIC_FRONT_ECHO = 3
-ULTRASONIC_RIGHT_TRIGGER = 23
-ULTRASONIC_RIGHT_ECHO = 21
+# ULTRASONIC_RIGHT_TRIGGER = 23
+# ULTRASONIC_RIGHT_ECHO = 21
 
-LIMIT_SWITCH_PIN_LEFT = 7
-LIMIT_SWITCH_PIN_RIGHT = 8
+LIMIT_SWITCH_PIN = 7
+
+# FAN_PIN = 8
 
 # Threshold distances in centimeters
 TOO_CLOSE_WALL = 18.0
@@ -30,27 +30,13 @@ TURNING_TIME = 3
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
 
-# Room dimensions in cm (example values)
-ROOM_WIDTH = 400
-ROOM_HEIGHT = 300
-ROBOT_DIAMETER = 40
-
-# Grid size based on robot diameter
-GRID_SIZE = ROBOT_DIAMETER
-
-# Number of grid cells
-NUM_CELLS_X = ROOM_WIDTH // GRID_SIZE
-NUM_CELLS_Y = ROOM_HEIGHT // GRID_SIZE
-
-# Create a grid to track visited cells
-visited_grid = np.zeros((NUM_CELLS_X, NUM_CELLS_Y), dtype=bool)
-
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
-    GPIO.setup([ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_FRONT_TRIGGER], GPIO.OUT)
-    GPIO.setup([ULTRASONIC_LEFT_ECHO, ULTRASONIC_RIGHT_ECHO, ULTRASONIC_FRONT_ECHO], GPIO.IN)
-    GPIO.setup([LIMIT_SWITCH_PIN_LEFT, LIMIT_SWITCH_PIN_RIGHT], GPIO.IN)
+    GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
+    GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
+    GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
+    # GPIO.setup(FAN_PIN, GPIO.OUT)
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -118,60 +104,57 @@ def get_distance(trigger_pin, echo_pin):
     distance = round(distance, 2)
     return distance
 
-def mark_cell_visited(x, y):
-    if 0 <= x < NUM_CELLS_X and 0 <= y < NUM_CELLS_Y:
-        visited_grid[x, y] = True
+# def turn_fan_on():
+#     GPIO.output(FAN_PIN, True)
+#     print("Fan turned on")
 
-def all_cells_visited():
-    return np.all(visited_grid)
 
 def main():
     setup_gpio()
     setup_pwm()
 
-    while True:
-        move_forward()
-        time.sleep(5)
-        move_backward()
-        time.sleep(5)
-    
+    try:            
+        last_turn = 'right'
 
-    # current_x = 0
-    # current_y = 0
-    # mark_cell_visited(current_x, current_y)
+        while True:
+            limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
+            if limit_switch_state == 1:
+                move_backward()
+                time.sleep(1)
+                turn_left()
+                time.sleep(TURNING_TIME)
+                turn_left()
+                time.sleep(TURNING_TIME)
+            else:
+                front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
 
-    # try:
-    #     while not all_cells_visited():
-    #         left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
-    #         right_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_RIGHT)
-    #         front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-    #         left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
-    #         right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+                time.sleep(0.1)
 
-    #         if left_limit_switch_state == 1 or right_limit_switch_state == 1 or front_distance < TOO_CLOSE_FRONT:
-    #             move_backward()
-    #             time.sleep(1)
-    #             turn_left()
-    #             time.sleep(TURNING_TIME)
-    #             turn_left()
-    #             time.sleep(TURNING_TIME)
-    #             current_x = max(current_x - 1, 0)  # Move to previous grid cell
-    #         elif left_distance < TOO_CLOSE_WALL:
-    #             turn_right()
-    #             time.sleep(TURNING_TIME / 2)
-    #         elif right_distance < TOO_CLOSE_WALL:
-    #             turn_left()
-    #             time.sleep(TURNING_TIME / 2)
-    #         else:
-    #             move_forward()
-    #             time.sleep(1)
-    #             current_y += 1  # Move to next grid cell
-    #             mark_cell_visited(current_x, current_y)
-    # except KeyboardInterrupt:
-    #     pass
-    # finally:
-    #     stop_motors()
-    #     cleanup_gpio()
+                if front_distance < TOO_CLOSE_FRONT:
+                    stop_motors()
+                    if last_turn == 'right':
+                        turn_left()
+                        time.sleep(TURNING_TIME)
+                        move_forward()
+                        time.sleep(2)
+                        turn_left()
+                        time.sleep(TURNING_TIME)
+                        last_turn = 'left'
+                    else:
+                        turn_right()
+                        time.sleep(TURNING_TIME)
+                        move_forward()
+                        time.sleep(2)
+                        turn_right()
+                        time.sleep(TURNING_TIME)
+                        last_turn = 'right'
+                else:
+                    move_forward()  # Move forward normally
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stop_motors()
+        cleanup_gpio()
 
 if __name__ == "__main__":
     main()
