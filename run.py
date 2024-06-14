@@ -136,6 +136,8 @@ def main():
         time.sleep(1)
         turn_right()
         time.sleep(1)
+        move_backward()
+        time.sleep(1)
         stop_motors()
     
 
