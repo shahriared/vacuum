@@ -66,30 +66,35 @@ def setup_pwm():
     print("PWM setup complete")
 
 def move_forward(speed=73):
+    print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
+    print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
+    print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
+    print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def stop_motors():
+    print("Stopping motors")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -129,37 +134,32 @@ def main():
     setup_gpio()
     setup_pwm()
 
-    current_x = 0
-    current_y = 0
-    mark_cell_visited(current_x, current_y)
+    print("Starting main loop")
 
     try:
-        while not all_cells_visited():
-            left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
-            right_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_RIGHT)
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-            left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
-            right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
+        # Simplified test: Move forward for 2 seconds
+        move_forward()
+        time.sleep(2)
+        stop_motors()
+        time.sleep(2)
+        
+        # Simplified test: Move backward for 2 seconds
+        move_backward()
+        time.sleep(2)
+        stop_motors()
+        time.sleep(2)
+        
+        # Simplified test: Turn left for 2 seconds
+        turn_left()
+        time.sleep(2)
+        stop_motors()
+        time.sleep(2)
+        
+        # Simplified test: Turn right for 2 seconds
+        turn_right()
+        time.sleep(2)
+        stop_motors()
 
-            if left_limit_switch_state == 1 or right_limit_switch_state == 1 or front_distance < TOO_CLOSE_FRONT:
-                move_backward()
-                time.sleep(1)
-                turn_left()
-                time.sleep(TURNING_TIME)
-                turn_left()
-                time.sleep(TURNING_TIME)
-                current_x = max(current_x - 1, 0)  # Move to previous grid cell
-            elif left_distance < TOO_CLOSE_WALL:
-                turn_right()
-                time.sleep(TURNING_TIME / 2)
-            elif right_distance < TOO_CLOSE_WALL:
-                turn_left()
-                time.sleep(TURNING_TIME / 2)
-            else:
-                move_forward()
-                time.sleep(1)
-                current_y += 1  # Move to next grid cell
-                mark_cell_visited(current_x, current_y)
     except KeyboardInterrupt:
         pass
     finally:
