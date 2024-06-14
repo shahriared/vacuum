@@ -134,32 +134,44 @@ def main():
     setup_gpio()
     setup_pwm()
 
-    print("Starting main loop")
+    current_x = 0
+    current_y = 0
+    mark_cell_visited(current_x, current_y)
 
     try:
-        # Simplified test: Move forward for 2 seconds
-        move_forward()
-        time.sleep(2)
-        stop_motors()
-        time.sleep(2)
-        
-        # Simplified test: Move backward for 2 seconds
-        move_backward()
-        time.sleep(2)
-        stop_motors()
-        time.sleep(2)
-        
-        # Simplified test: Turn left for 2 seconds
-        turn_left()
-        time.sleep(2)
-        stop_motors()
-        time.sleep(2)
-        
-        # Simplified test: Turn right for 2 seconds
-        turn_right()
-        time.sleep(2)
-        stop_motors()
+        while not all_cells_visited():
+            left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
+            right_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_RIGHT)
+            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            left_distance = get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
+            right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
 
+            print(f"Front distance: {front_distance}, Left distance: {left_distance}, Right distance: {right_distance}")
+            print(f"Left limit switch: {left_limit_switch_state}, Right limit switch: {right_limit_switch_state}")
+
+            if left_limit_switch_state == 1 or right_limit_switch_state == 1 or front_distance < TOO_CLOSE_FRONT:
+                print("Obstacle detected, moving backward and turning around")
+                move_backward()
+                time.sleep(1)
+                turn_left()
+                time.sleep(TURNING_TIME)
+                turn_left()
+                time.sleep(TURNING_TIME)
+                current_x = max(current_x - 1, 0)  # Move to previous grid cell
+            elif left_distance < TOO_CLOSE_WALL:
+                print("Too close to left wall, turning right")
+                turn_right()
+                time.sleep(TURNING_TIME / 2)
+            elif right_distance < TOO_CLOSE_WALL:
+                print("Too close to right wall, turning left")
+                turn_left()
+                time.sleep(TURNING_TIME / 2)
+            else:
+                print("Moving forward")
+                move_forward()
+                time.sleep(1)
+                current_y += 1  # Move to next grid cell
+                mark_cell_visited(current_x, current_y)
     except KeyboardInterrupt:
         pass
     finally:
