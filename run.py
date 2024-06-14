@@ -131,14 +131,9 @@ def main():
 
     while True:
         move_forward()
-        time.sleep(1)
-        turn_left()
-        time.sleep(1)
-        turn_right()
-        time.sleep(1)
+        time.sleep(5)
         move_backward()
-        time.sleep(1)
-        stop_motors()
+        time.sleep(5)
     
 
     # current_x = 0
