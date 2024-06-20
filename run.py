@@ -12,8 +12,7 @@ MOTOR_2_PIN_2 = 35
 ULTRASONIC_FRONT_TRIGGER = 5
 ULTRASONIC_FRONT_ECHO = 3
 
-LIMIT_SWITCH_PIN_LEFT = 7
-LIMIT_SWITCH_PIN_RIGHT = 8
+LIMIT_SWITCH_PIN = 7
 
 # Threshold distances in centimeters
 TOO_CLOSE_FRONT = 10.0
@@ -47,9 +46,8 @@ def setup_gpio():
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-    GPIO.setup([LIMIT_SWITCH_PIN_LEFT, LIMIT_SWITCH_PIN_RIGHT], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    #GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-    #GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+    GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
     print("GPIO setup complete")
 
 def cleanup_gpio():
