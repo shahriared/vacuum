@@ -174,6 +174,8 @@ def main():
                 current_y += 1  # Move to next grid cell
                 mark_cell_visited(current_x, current_y)
 
+            stop_motors()  # Ensure motors stop between actions
+
     except KeyboardInterrupt:
         pass
     finally:
