@@ -2,6 +2,8 @@ import time
 import RPi.GPIO as GPIO
 import numpy as np
 
+GPIO.cleanup()
+
 # Constants for motor pins
 MOTOR_1_PIN_1 = 15
 MOTOR_1_PIN_2 = 11
@@ -48,8 +50,15 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup([LIMIT_SWITCH_PIN_LEFT, LIMIT_SWITCH_PIN_RIGHT], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-    GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+
+    try:
+        GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+        GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+    except RuntimeError as e:
+        print(f"Error setting up GPIO event detection: {e}")
+        cleanup_gpio()
+        exit(1)
+
     print("GPIO setup complete")
 
 def cleanup_gpio():
