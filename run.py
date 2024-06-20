@@ -148,7 +148,7 @@ def main():
             print(f"Left limit switch: {left_limit_switch_state}, Right limit switch: {right_limit_switch_state}")
             left_distance =get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
             print(f"Left distance: {left_distance}")
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            front_distance =15 #get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print(f"Front distance: {front_distance}")
             
             right_distance = get_distance(ULTRASONIC_RIGHT_TRIGGER, ULTRASONIC_RIGHT_ECHO)
