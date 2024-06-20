@@ -41,7 +41,12 @@ visited_grid = np.zeros((NUM_CELLS_X, NUM_CELLS_Y), dtype=bool)
 # Flag to handle limit switch interrupt
 interrupt_flag = False
 
+# Disable GPIO warnings
+GPIO.setwarnings(False)
+
 def setup_gpio():
+    # Clean up GPIO to reset any previous configurations
+    GPIO.cleanup()
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
