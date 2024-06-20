@@ -19,7 +19,7 @@ LIMIT_SWITCH_PIN_RIGHT = 8
 TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
-TURNING_TIME = 1.5
+TURNING_TIME = 3
 
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
@@ -132,12 +132,16 @@ def main():
     current_y = 0
     mark_cell_visited(current_x, current_y)
 
+    print(not all_cells_visited())
+
     try:
         while not all_cells_visited():
             print(f"Current position: ({current_x}, {current_y})")
             left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
             right_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_RIGHT)
+            print(f"Left limit switch: {left_limit_switch_state}, Right limit switch: {right_limit_switch_state}")
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            print(f"Front distance: {front_distance}")
 
             print(f"Front distance: {front_distance}")
             print(f"Left limit switch: {left_limit_switch_state}, Right limit switch: {right_limit_switch_state}")
@@ -157,9 +161,6 @@ def main():
                 time.sleep(1)
                 current_y += 1  # Move to next grid cell
                 mark_cell_visited(current_x, current_y)
-
-            stop_motors()  # Ensure motors stop between actions
-
     except KeyboardInterrupt:
         pass
     finally:
