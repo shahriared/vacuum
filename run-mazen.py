@@ -2,7 +2,6 @@ import time
 import RPi.GPIO as GPIO
 import numpy as np
 
-
 # Constants for motor pins
 MOTOR_1_PIN_1 = 15
 MOTOR_1_PIN_2 = 11
@@ -20,7 +19,7 @@ LIMIT_SWITCH_PIN_RIGHT = 8
 TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
-TURNING_TIME = 3
+TURNING_TIME = 1.5
 
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
@@ -50,15 +49,15 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup([LIMIT_SWITCH_PIN_LEFT, LIMIT_SWITCH_PIN_RIGHT], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    #try:
-        #GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-        #GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-    #except RuntimeError as e:
-        #print(f"Error setting up GPIO event detection: {e}")
-        #cleanup_gpio()
-        #exit(1)
+    try:
+        GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+        GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+    except RuntimeError as e:
+        print(f"Error setting up GPIO event detection: {e}")
+        cleanup_gpio()
+        exit(1)
 
-    #print("GPIO setup complete")
+    print("GPIO setup complete")
 
 def cleanup_gpio():
     GPIO.cleanup()
@@ -161,19 +160,20 @@ def main():
     current_y = 0
     mark_cell_visited(current_x, current_y)
 
-    print(not all_cells_visited())
+    print("Starting navigation")
 
     try:
         while not all_cells_visited():
             print(f"Current position: ({current_x}, {current_y})")
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-            print(f"Front distance: {front_distance}")
+            print(f"Front distance: {front_distance} cm")
 
             if check_for_obstacles_or_limits():
                 print("Obstacle detected or limit switch pressed, moving backward and turning around")
                 stop_motors()
                 move_backward()
                 time.sleep(1)
+                stop_motors()
                 interrupt_flag = False  # Reset the interrupt flag
                 for _ in range(2):  # Turn 180 degrees
                     turn_left()
@@ -183,15 +183,18 @@ def main():
                             stop_motors()
                             move_backward()
                             time.sleep(1)
+                            stop_motors()
                             interrupt_flag = False  # Reset the interrupt flag
                             break
                         time.sleep(0.1)
+                    stop_motors()
                 current_x = max(current_x - 1, 0)  # Move to previous grid cell
             else:
-                print("Moving forward")
+                print("Moving forward to next cell")
                 move_forward()
                 time.sleep(1)
-                current_y += 1  # Move to next grid cell
+                stop_motors()
+                current_y = min(current_y + 1, NUM_CELLS_Y - 1)  # Move to next grid cell
                 mark_cell_visited(current_x, current_y)
     except KeyboardInterrupt:
         pass
