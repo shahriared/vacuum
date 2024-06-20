@@ -146,7 +146,7 @@ def main():
             left_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_LEFT)
             right_limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN_RIGHT)
             print(f"Left limit switch: {left_limit_switch_state}, Right limit switch: {right_limit_switch_state}")
-            left_distance =10  #get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
+            left_distance =20  #get_distance(ULTRASONIC_LEFT_TRIGGER, ULTRASONIC_LEFT_ECHO)
             print(f"Left distance: {left_distance}")
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print(f"Front distance: {front_distance}")
