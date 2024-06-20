@@ -151,4 +151,31 @@ def main():
     try:
         while not all_cells_visited():
             print(f"Current position: ({current_x}, {current_y})")
-            front_distance = get_distance(ULTR
+            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            print(f"Front distance: {front_distance}")
+
+            if interrupt_flag or front_distance < TOO_CLOSE_FRONT:
+                print("Obstacle detected or limit switch pressed, moving backward and turning around")
+                stop_motors()
+                move_backward()
+                time.sleep(1)
+                turn_left()
+                time.sleep(TURNING_TIME)
+                turn_left()
+                time.sleep(TURNING_TIME)
+                current_x = max(current_x - 1, 0)  # Move to previous grid cell
+                interrupt_flag = False  # Reset the interrupt flag
+            else:
+                print("Moving forward")
+                move_forward()
+                time.sleep(1)
+                current_y += 1  # Move to next grid cell
+                mark_cell_visited(current_x, current_y)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stop_motors()
+        cleanup_gpio()
+
+if __name__ == "__main__":
+    main()
