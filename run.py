@@ -50,7 +50,6 @@ def limit_switch_callback(channel):
     print(f"Limit switch on pin {channel} pressed")
 
 def setup_gpio():
-    # Clean up GPIO to reset any previous configurations
     GPIO.cleanup()
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
