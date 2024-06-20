@@ -1,6 +1,7 @@
 import time
 import RPi.GPIO as GPIO
-import numpy as np
+import argparse
+import keyboard
 
 # Constants for motor pins
 MOTOR_1_PIN_1 = 15
@@ -9,54 +10,35 @@ MOTOR_2_PIN_1 = 12
 MOTOR_2_PIN_2 = 35
 
 # Ultrasonic sensor pins
+# ULTRASONIC_LEFT_TRIGGER = 38
+# ULTRASONIC_LEFT_ECHO = 40
 ULTRASONIC_FRONT_TRIGGER = 5
 ULTRASONIC_FRONT_ECHO = 3
+# ULTRASONIC_RIGHT_TRIGGER = 23
+# ULTRASONIC_RIGHT_ECHO = 21
 
 LIMIT_SWITCH_PIN = 7
 
+# FAN_PIN = 8
+
 # Threshold distances in centimeters
+TOO_CLOSE_WALL = 18.0
+TOO_FAR_WALL = 25.0
 TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
-TURNING_TIME = 3
+TURNING_TIME = 2.6
 
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
 
-# Room dimensions in cm (example values)
-ROOM_WIDTH = 400
-ROOM_HEIGHT = 300
-ROBOT_DIAMETER = 40
-
-# Grid size based on robot diameter
-GRID_SIZE = ROBOT_DIAMETER
-
-# Number of grid cells
-NUM_CELLS_X = ROOM_WIDTH // GRID_SIZE
-NUM_CELLS_Y = ROOM_HEIGHT // GRID_SIZE
-
-# Create a grid to track visited cells
-visited_grid = np.zeros((NUM_CELLS_X, NUM_CELLS_Y), dtype=bool)
-
-# Flag to handle limit switch interrupt
-interrupt_flag = False
-
-# Disable GPIO warnings
-GPIO.setwarnings(False)
-
-def limit_switch_callback(channel):
-    global interrupt_flag
-    interrupt_flag = True
-    print(f"Limit switch on pin {channel} pressed")
-
 def setup_gpio():
-    GPIO.cleanup()
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-    GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    #GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+    GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
+    # GPIO.setup(FAN_PIN, GPIO.OUT)
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -72,35 +54,30 @@ def setup_pwm():
     print("PWM setup complete")
 
 def move_forward(speed=73):
-    print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
-    print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
-    print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
-    print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def stop_motors():
-    print("Stopping motors")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -129,48 +106,52 @@ def get_distance(trigger_pin, echo_pin):
     distance = round(distance, 2)
     return distance
 
-def mark_cell_visited(x, y):
-    if 0 <= x < NUM_CELLS_X and 0 <= y < NUM_CELLS_Y:
-        visited_grid[x, y] = True
+# def turn_fan_on():
+#     GPIO.output(FAN_PIN, True)
+#     print("Fan turned on")
 
-def all_cells_visited():
-    return np.all(visited_grid)
 
 def main():
-    global interrupt_flag
-
     setup_gpio()
     setup_pwm()
 
-    current_x = 0
-    current_y = 0
-    mark_cell_visited(current_x, current_y)
+    try:            
+        last_turn = 'right'
 
-    print(not all_cells_visited())
-
-    try:
-        while not all_cells_visited():
-            print(f"Current position: ({current_x}, {current_y})")
-            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-            print(f"Front distance: {front_distance}")
-
-            if interrupt_flag or front_distance < TOO_CLOSE_FRONT:
-                print("Obstacle detected or limit switch pressed, moving backward and turning around")
-                stop_motors()
+        while True:
+            limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
+            if limit_switch_state == 1:
                 move_backward()
                 time.sleep(1)
                 turn_left()
                 time.sleep(TURNING_TIME)
                 turn_left()
                 time.sleep(TURNING_TIME)
-                current_x = max(current_x - 1, 0)  # Move to previous grid cell
-                interrupt_flag = False  # Reset the interrupt flag
             else:
-                print("Moving forward")
-                move_forward()
-                time.sleep(1)
-                current_y += 1  # Move to next grid cell
-                mark_cell_visited(current_x, current_y)
+                front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+
+                time.sleep(0.1)
+
+                if front_distance < TOO_CLOSE_FRONT:
+                    stop_motors()
+                    if last_turn == 'right':
+                        turn_left()
+                        time.sleep(TURNING_TIME)
+                        move_forward()
+                        time.sleep(2)
+                        turn_left()
+                        time.sleep(TURNING_TIME)
+                        last_turn = 'left'
+                    else:
+                        turn_right()
+                        time.sleep(TURNING_TIME)
+                        move_forward()
+                        time.sleep(2)
+                        turn_right()
+                        time.sleep(TURNING_TIME)
+                        last_turn = 'right'
+                else:
+                    move_forward()  # Move forward normally
     except KeyboardInterrupt:
         pass
     finally:
