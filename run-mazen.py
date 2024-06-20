@@ -2,7 +2,6 @@ import time
 import RPi.GPIO as GPIO
 import numpy as np
 
-GPIO.cleanup()
 
 # Constants for motor pins
 MOTOR_1_PIN_1 = 15
