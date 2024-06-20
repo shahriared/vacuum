@@ -44,6 +44,11 @@ interrupt_flag = False
 # Disable GPIO warnings
 GPIO.setwarnings(False)
 
+def limit_switch_callback(channel):
+    global interrupt_flag
+    interrupt_flag = True
+    print(f"Limit switch on pin {channel} pressed")
+
 def setup_gpio():
     # Clean up GPIO to reset any previous configurations
     GPIO.cleanup()
@@ -135,11 +140,6 @@ def mark_cell_visited(x, y):
 
 def all_cells_visited():
     return np.all(visited_grid)
-
-def limit_switch_callback(channel):
-    global interrupt_flag
-    interrupt_flag = True
-    print(f"Limit switch on pin {channel} pressed")
 
 def main():
     global interrupt_flag
