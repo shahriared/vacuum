@@ -48,8 +48,8 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup([LIMIT_SWITCH_PIN_LEFT, LIMIT_SWITCH_PIN_RIGHT], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    #GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-    #GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+    GPIO.add_event_detect(LIMIT_SWITCH_PIN_LEFT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+    GPIO.add_event_detect(LIMIT_SWITCH_PIN_RIGHT, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
     print("GPIO setup complete")
 
 def cleanup_gpio():
@@ -134,6 +134,15 @@ def limit_switch_callback(channel):
     interrupt_flag = True
     print(f"Limit switch on pin {channel} pressed")
 
+def check_for_obstacles_or_limits():
+    global interrupt_flag
+    front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+    if interrupt_flag or front_distance < TOO_CLOSE_FRONT:
+        print("Obstacle detected or limit switch pressed")
+        interrupt_flag = True
+        return True
+    return False
+
 def main():
     global interrupt_flag
 
@@ -152,17 +161,24 @@ def main():
             front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
             print(f"Front distance: {front_distance}")
 
-            if interrupt_flag or front_distance < TOO_CLOSE_FRONT:
+            if check_for_obstacles_or_limits():
                 print("Obstacle detected or limit switch pressed, moving backward and turning around")
                 stop_motors()
                 move_backward()
                 time.sleep(1)
-                turn_left()
-                time.sleep(TURNING_TIME)
-                turn_left()
-                time.sleep(TURNING_TIME)
-                current_x = max(current_x - 1, 0)  # Move to previous grid cell
                 interrupt_flag = False  # Reset the interrupt flag
+                for _ in range(2):  # Turn 180 degrees
+                    turn_left()
+                    turn_start_time = time.time()
+                    while time.time() - turn_start_time < TURNING_TIME:
+                        if check_for_obstacles_or_limits():
+                            stop_motors()
+                            move_backward()
+                            time.sleep(1)
+                            interrupt_flag = False  # Reset the interrupt flag
+                            break
+                        time.sleep(0.1)
+                current_x = max(current_x - 1, 0)  # Move to previous grid cell
             else:
                 print("Moving forward")
                 move_forward()
