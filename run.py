@@ -149,12 +149,13 @@ def main():
     setup_gpio()
     setup_pwm()
 
-    turn_on_fan()
+    
 
     try:            
         last_turn = 'right'
 
         while True:
+            turn_on_fan()
             limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
             if limit_switch_state == 0:
                 move_backward()
