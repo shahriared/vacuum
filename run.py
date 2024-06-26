@@ -14,7 +14,7 @@ ULTRASONIC_FRONT_ECHO = 21
 
 LIMIT_SWITCH_PIN = 7
 
-FAN_PIN = 8
+FAN_PIN = 40
 
 # Threshold distances in centimeters
 TOO_CLOSE_FRONT = 10.0
