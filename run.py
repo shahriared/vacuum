@@ -53,7 +53,7 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(TURN_ON_OFF_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    
+
 def cleanup_gpio():
     GPIO.cleanup()
     print("GPIO cleaned up")
@@ -142,7 +142,6 @@ def main():
         last_turn = 'right'
 
         while True:
-            print(GPIO.input(TURN_ON_OFF_BUTTON_PIN))
             turn_on_fan()
             limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
             if limit_switch_state == 0:
@@ -186,7 +185,9 @@ def main():
 def check_button_and_run():
     try:
         while True:
-            if GPIO.input(TURN_ON_OFF_BUTTON_PIN) == 0:
+            button_state = GPIO.input(TURN_ON_OFF_BUTTON_PIN)
+            print(f"Button state: {button_state}")  # Debug statement
+            if button_state == 0:
                 print("Button pressed, starting main loop.")
                 main()
             else:
