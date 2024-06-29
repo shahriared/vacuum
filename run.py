@@ -42,6 +42,9 @@ NUM_CELLS_Y = ROOM_HEIGHT // GRID_SIZE
 # Create a grid to track visited cells
 visited_grid = np.zeros((NUM_CELLS_X, NUM_CELLS_Y), dtype=bool)
 
+# Toggle variable
+is_stopped = False
+
 # Flag to handle limit switch interrupt
 interrupt_flag = False
 
@@ -51,6 +54,12 @@ GPIO.setwarnings(False)
 def limit_switch_callback(channel):
     global interrupt_flag
     interrupt_flag = True
+
+def toggle_stop(channel):
+    global is_stopped
+    is_stopped = not is_stopped
+    if is_stopped:
+        stop_motors()
 
 def setup_gpio():
     GPIO.cleanup()
@@ -63,7 +72,7 @@ def setup_gpio():
     
     try:
         GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-        GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+        GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, callback=toggle_stop, bouncetime=200)
     except RuntimeError as e:
         return False
 
@@ -78,8 +87,7 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)
 
 def move_forward(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 0:
-        GPIO.output(FAN_PIN, False)
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -88,8 +96,7 @@ def move_forward(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 0:
-        GPIO.output(FAN_PIN, False)
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -98,8 +105,7 @@ def move_backward(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 0:
-        GPIO.output(FAN_PIN, False)
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -108,8 +114,7 @@ def turn_left(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 0:
-        GPIO.output(FAN_PIN, False)
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -154,8 +159,7 @@ def all_cells_visited():
     return np.all(visited_grid)
 
 def turn_on_fan():
-    if GPIO.input(STOP_BUTTON_PIN) == 0:
-        GPIO.output(FAN_PIN, False)
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(FAN_PIN, True)
@@ -171,15 +175,17 @@ def main():
         if limit_switch_state == 0:
             should_run = True
             break
+
     if should_run:
-        try:            
+        try:
             last_turn = 'right'
 
             while True:
-                if GPIO.input(STOP_BUTTON_PIN) == 0:
-                    GPIO.output(FAN_PIN, False)
+                if is_stopped:
                     stop_motors()
-                    break
+                    time.sleep(0.1)
+                    continue
+
                 turn_on_fan()
                 limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
                 if limit_switch_state == 0:
@@ -191,7 +197,6 @@ def main():
                     time.sleep(TURNING_TIME)
                 else:
                     front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-
                     time.sleep(0.1)
 
                     if front_distance < TOO_CLOSE_FRONT:
@@ -214,6 +219,7 @@ def main():
                             last_turn = 'right'
                     else:
                         move_forward()
+
         except KeyboardInterrupt:
             pass
         finally:
