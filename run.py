@@ -12,10 +12,7 @@ MOTOR_2_PIN_2 = 35
 ULTRASONIC_FRONT_TRIGGER = 5
 ULTRASONIC_FRONT_ECHO = 21
 
-LIMIT_SWITCH_PIN = 7
-
 STOP_BUTTON_PIN = 38
-
 FAN_PIN = 40
 
 # Threshold distances in centimeters
@@ -45,15 +42,8 @@ visited_grid = np.zeros((NUM_CELLS_X, NUM_CELLS_Y), dtype=bool)
 # Toggle variable
 is_stopped = True
 
-# Flag to handle limit switch interrupt
-interrupt_flag = False
-
 # Disable GPIO warnings
 GPIO.setwarnings(False)
-
-def limit_switch_callback(channel):
-    global interrupt_flag
-    interrupt_flag = True
 
 def toggle_stop(channel):
     global is_stopped
@@ -67,11 +57,9 @@ def setup_gpio():
     GPIO.setup([MOTOR_1_PIN_1, MOTOR_1_PIN_2, MOTOR_2_PIN_1, MOTOR_2_PIN_2, FAN_PIN], GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
-    GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(STOP_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     try:
-        GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
         GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, callback=toggle_stop, bouncetime=200)
     except RuntimeError as e:
         return False
@@ -87,7 +75,7 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)
 
 def move_forward(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 1:
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -96,7 +84,7 @@ def move_forward(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 1:
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -105,7 +93,7 @@ def move_backward(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 1:
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -114,7 +102,7 @@ def turn_left(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
-    if GPIO.input(STOP_BUTTON_PIN) == 1:
+    if is_stopped:
         stop_motors()
         return
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -159,9 +147,8 @@ def all_cells_visited():
     return np.all(visited_grid)
 
 def turn_on_fan():
-    if GPIO.input(STOP_BUTTON_PIN) == 1:
+    if is_stopped:
         stop_motors()
-        GPIO.output(FAN_PIN, False)
         return
     GPIO.output(FAN_PIN, True)
 
@@ -169,63 +156,46 @@ def main():
     setup_gpio()
     setup_pwm()
 
-    should_run = False
+    try:
+        last_turn = 'right'
 
-    while True:
-        limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
-        if limit_switch_state == 0:
-            should_run = True
-            break
+        while True:
+            if is_stopped:
+                stop_motors()
+                time.sleep(0.1)
+                continue
 
-    if should_run:
-        try:
-            last_turn = 'right'
+            turn_on_fan()
+            
+            front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+            time.sleep(0.1)
 
-            while True:
-                if GPIO.input(STOP_BUTTON_PIN) == 1:
-                    stop_motors()
-                    time.sleep(0.1)
-                    continue
-
-                turn_on_fan()
-                limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
-                if limit_switch_state == 0:
-                    move_backward()
-                    time.sleep(1)
+            if front_distance < TOO_CLOSE_FRONT:
+                stop_motors()
+                if last_turn == 'right':
                     turn_left()
                     time.sleep(TURNING_TIME)
+                    move_forward()
+                    time.sleep(2)
                     turn_left()
                     time.sleep(TURNING_TIME)
+                    last_turn = 'left'
                 else:
-                    front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-                    time.sleep(0.1)
+                    turn_right()
+                    time.sleep(TURNING_TIME)
+                    move_forward()
+                    time.sleep(2)
+                    turn_right()
+                    time.sleep(TURNING_TIME)
+                    last_turn = 'right'
+            else:
+                move_forward()
 
-                    if front_distance < TOO_CLOSE_FRONT:
-                        stop_motors()
-                        if last_turn == 'right':
-                            turn_left()
-                            time.sleep(TURNING_TIME)
-                            move_forward()
-                            time.sleep(2)
-                            turn_left()
-                            time.sleep(TURNING_TIME)
-                            last_turn = 'left'
-                        else:
-                            turn_right()
-                            time.sleep(TURNING_TIME)
-                            move_forward()
-                            time.sleep(2)
-                            turn_right()
-                            time.sleep(TURNING_TIME)
-                            last_turn = 'right'
-                    else:
-                        move_forward()
-
-        except KeyboardInterrupt:
-            pass
-        finally:
-            stop_motors()
-            cleanup_gpio()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stop_motors()
+        cleanup_gpio()
 
 if __name__ == "__main__":
     main()
