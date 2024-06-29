@@ -49,7 +49,7 @@ GPIO.setwarnings(False)
 def limit_switch_callback(channel):
     global interrupt_flag
     interrupt_flag = True
-    print(f"Limit switch on pin {channel} pressed")
+    # print(f"Limit switch on pin {channel} pressed")
 
 def setup_gpio():
     GPIO.cleanup()
@@ -61,13 +61,13 @@ def setup_gpio():
     
     try:
         GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-        print("GPIO setup complete")
+        # print("GPIO setup complete")
     except RuntimeError as e:
-        print(f"Failed to add edge detection: {e}")
+        # print(f"Failed to add edge detection: {e}")
 
 def cleanup_gpio():
     GPIO.cleanup()
-    print("GPIO cleaned up")
+    # print("GPIO cleaned up")
 
 def setup_pwm():
     global pwm_motor_2_pin_1, pwm_motor_2_pin_2
@@ -75,38 +75,38 @@ def setup_pwm():
     pwm_motor_2_pin_2 = GPIO.PWM(MOTOR_2_PIN_2, PWM_FREQ)
     pwm_motor_2_pin_1.start(0)
     pwm_motor_2_pin_2.start(0)
-    print("PWM setup complete")
+    # print("PWM setup complete")
 
 def move_forward(speed=73):
-    print("Moving forward")
+    # print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
-    print("Moving backward")
+    # print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
-    print("Turning left")
+    # print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
-    print("Turning right")
+    # print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def stop_motors():
-    print("Stopping motors")
+    # print("Stopping motors")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -149,51 +149,57 @@ def main():
     setup_gpio()
     setup_pwm()
 
-    
+    should_run = False
 
-    try:            
-        last_turn = 'right'
+    while True:
+        limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
+        if limit_switch_state == 0:
+            should_run = True
+            break
+    if should_run:
+        try:            
+            last_turn = 'right'
 
-        while True:
-            turn_on_fan()
-            limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
-            if limit_switch_state == 0:
-                move_backward()
-                time.sleep(1)
-                turn_left()
-                time.sleep(TURNING_TIME)
-                turn_left()
-                time.sleep(TURNING_TIME)
-            else:
-                front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
-
-                time.sleep(0.1)
-
-                if front_distance < TOO_CLOSE_FRONT:
-                    stop_motors()
-                    if last_turn == 'right':
-                        turn_left()
-                        time.sleep(TURNING_TIME)
-                        move_forward()
-                        time.sleep(2)
-                        turn_left()
-                        time.sleep(TURNING_TIME)
-                        last_turn = 'left'
-                    else:
-                        turn_right()
-                        time.sleep(TURNING_TIME)
-                        move_forward()
-                        time.sleep(2)
-                        turn_right()
-                        time.sleep(TURNING_TIME)
-                        last_turn = 'right'
+            while True:
+                turn_on_fan()
+                limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
+                if limit_switch_state == 0:
+                    move_backward()
+                    time.sleep(1)
+                    turn_left()
+                    time.sleep(TURNING_TIME)
+                    turn_left()
+                    time.sleep(TURNING_TIME)
                 else:
-                    move_forward()  # Move forward normally
-    except KeyboardInterrupt:
-        pass
-    finally:
-        stop_motors()
-        cleanup_gpio()
+                    front_distance = get_distance(ULTRASONIC_FRONT_TRIGGER, ULTRASONIC_FRONT_ECHO)
+
+                    time.sleep(0.1)
+
+                    if front_distance < TOO_CLOSE_FRONT:
+                        stop_motors()
+                        if last_turn == 'right':
+                            turn_left()
+                            time.sleep(TURNING_TIME)
+                            move_forward()
+                            time.sleep(2)
+                            turn_left()
+                            time.sleep(TURNING_TIME)
+                            last_turn = 'left'
+                        else:
+                            turn_right()
+                            time.sleep(TURNING_TIME)
+                            move_forward()
+                            time.sleep(2)
+                            turn_right()
+                            time.sleep(TURNING_TIME)
+                            last_turn = 'right'
+                    else:
+                        move_forward()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            stop_motors()
+            cleanup_gpio()
 
 if __name__ == "__main__":
     main()
