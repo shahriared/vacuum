@@ -14,6 +14,8 @@ ULTRASONIC_FRONT_ECHO = 21
 
 LIMIT_SWITCH_PIN = 7
 
+STOP_BUTTON_PIN = 38
+
 FAN_PIN = 40
 
 # Threshold distances in centimeters
@@ -57,9 +59,11 @@ def setup_gpio():
     GPIO.setup(ULTRASONIC_FRONT_TRIGGER, GPIO.OUT)
     GPIO.setup(ULTRASONIC_FRONT_ECHO, GPIO.IN)
     GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(STOP_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     try:
         GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
+        GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
     except RuntimeError as e:
         return False
 
@@ -74,24 +78,40 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)
 
 def move_forward(speed=73):
+    if GPIO.input(STOP_BUTTON_PIN) == 0:
+        GPIO.output(FAN_PIN, False)
+        stop_motors()
+        return
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
+    if GPIO.input(STOP_BUTTON_PIN) == 0:
+        GPIO.output(FAN_PIN, False)
+        stop_motors()
+        return
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
+    if GPIO.input(STOP_BUTTON_PIN) == 0:
+        GPIO.output(FAN_PIN, False)
+        stop_motors()
+        return
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
+    if GPIO.input(STOP_BUTTON_PIN) == 0:
+        GPIO.output(FAN_PIN, False)
+        stop_motors()
+        return
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -134,6 +154,10 @@ def all_cells_visited():
     return np.all(visited_grid)
 
 def turn_on_fan():
+    if GPIO.input(STOP_BUTTON_PIN) == 0:
+        GPIO.output(FAN_PIN, False)
+        stop_motors()
+        return
     GPIO.output(FAN_PIN, True)
 
 def main():
@@ -152,6 +176,10 @@ def main():
             last_turn = 'right'
 
             while True:
+                if GPIO.input(STOP_BUTTON_PIN) == 0:
+                    GPIO.output(FAN_PIN, False)
+                    stop_motors()
+                    break
                 turn_on_fan()
                 limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
                 if limit_switch_state == 0:
