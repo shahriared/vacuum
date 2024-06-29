@@ -49,7 +49,6 @@ GPIO.setwarnings(False)
 def limit_switch_callback(channel):
     global interrupt_flag
     interrupt_flag = True
-    # print(f"Limit switch on pin {channel} pressed")
 
 def setup_gpio():
     GPIO.cleanup()
@@ -61,13 +60,11 @@ def setup_gpio():
     
     try:
         GPIO.add_event_detect(LIMIT_SWITCH_PIN, GPIO.FALLING, callback=limit_switch_callback, bouncetime=200)
-        # print("GPIO setup complete")
     except RuntimeError as e:
-        # print(f"Failed to add edge detection: {e}")
+        return False
 
 def cleanup_gpio():
     GPIO.cleanup()
-    # print("GPIO cleaned up")
 
 def setup_pwm():
     global pwm_motor_2_pin_1, pwm_motor_2_pin_2
@@ -75,38 +72,32 @@ def setup_pwm():
     pwm_motor_2_pin_2 = GPIO.PWM(MOTOR_2_PIN_2, PWM_FREQ)
     pwm_motor_2_pin_1.start(0)
     pwm_motor_2_pin_2.start(0)
-    # print("PWM setup complete")
 
 def move_forward(speed=73):
-    # print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def move_backward(speed=73):
-    # print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def turn_left(speed=73):
-    # print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 def turn_right(speed=73):
-    # print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 def stop_motors():
-    # print("Stopping motors")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
