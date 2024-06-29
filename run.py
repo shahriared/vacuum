@@ -142,6 +142,7 @@ def main():
         last_turn = 'right'
 
         while True:
+            print(GPIO.input(TURN_ON_OFF_BUTTON_PIN))
             turn_on_fan()
             limit_switch_state = GPIO.input(LIMIT_SWITCH_PIN)
             if limit_switch_state == 0:
