@@ -20,11 +20,7 @@ def test_button():
     setup_gpio()
     try:
         while True:
-            button_state = GPIO.input(TURN_ON_OFF_BUTTON_PIN)
-            if button_state == 0:
-                print("Button pressed")
-            else:
-                print("Button released")
+            print(GPIO.input(TURN_ON_OFF_BUTTON_PIN))
             time.sleep(0.1)  # Check button state every 100ms
     except KeyboardInterrupt:
         cleanup_gpio()
