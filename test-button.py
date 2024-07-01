@@ -2,7 +2,7 @@ import time
 import RPi.GPIO as GPIO
 
 # Define the pin number for the button
-TURN_ON_OFF_BUTTON_PIN = 37
+TURN_ON_OFF_BUTTON_PIN = 23
 
 # Disable GPIO warnings
 GPIO.setwarnings(False)
