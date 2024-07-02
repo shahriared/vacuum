@@ -74,6 +74,8 @@ def check_button(func):
         if button_state == 0:
             return func(*args, **kwargs)
         else:
+            stop_motors()
+            GPIO.output(FAN_PIN, False)
             print("Button not pressed, action halted.")
             return None
     return wrapper
