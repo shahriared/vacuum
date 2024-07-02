@@ -67,6 +67,14 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)
     print("PWM setup complete")
 
+def stop_motors_and_fan():
+    GPIO.output(MOTOR_1_PIN_1, False)
+    GPIO.output(MOTOR_1_PIN_2, False)
+    pwm_motor_2_pin_1.ChangeDutyCycle(0)
+    pwm_motor_2_pin_2.ChangeDutyCycle(0)
+    GPIO.output(FAN_PIN, False)
+    print("Motors and fan stopped")
+
 def check_button(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -74,8 +82,7 @@ def check_button(func):
         if button_state == 0:
             return func(*args, **kwargs)
         else:
-            stop_motors()
-            GPIO.output(FAN_PIN, False)
+            stop_motors_and_fan()
             print("Button not pressed, action halted.")
             return None
     return wrapper
@@ -199,7 +206,7 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
-        stop_motors()
+        stop_motors_and_fan()
         cleanup_gpio()
 
 def check_button_and_run():
@@ -211,6 +218,7 @@ def check_button_and_run():
                 print("Button pressed, starting main loop.")
                 main()
             else:
+                stop_motors_and_fan()
                 print("Button not pressed, waiting.")
             time.sleep(1)  # Check button state every second
     except KeyboardInterrupt:
