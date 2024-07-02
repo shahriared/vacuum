@@ -1,6 +1,7 @@
 import time
 import RPi.GPIO as GPIO
 import numpy as np
+from functools import wraps
 
 # Constants for motor pins
 MOTOR_1_PIN_1 = 11
@@ -66,6 +67,18 @@ def setup_pwm():
     pwm_motor_2_pin_2.start(0)
     print("PWM setup complete")
 
+def check_button(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        button_state = GPIO.input(TURN_ON_OFF_BUTTON_PIN)
+        if button_state == 0:
+            return func(*args, **kwargs)
+        else:
+            print("Button not pressed, action halted.")
+            return None
+    return wrapper
+
+@check_button
 def move_forward(speed=73):
     print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -73,6 +86,7 @@ def move_forward(speed=73):
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
+@check_button
 def move_backward(speed=73):
     print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -80,6 +94,7 @@ def move_backward(speed=73):
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
+@check_button
 def turn_left(speed=73):
     print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -87,6 +102,7 @@ def turn_left(speed=73):
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
+@check_button
 def turn_right(speed=73):
     print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
@@ -94,6 +110,7 @@ def turn_right(speed=73):
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
+@check_button
 def stop_motors():
     print("Stopping motors")
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -131,6 +148,7 @@ def mark_cell_visited(x, y):
 def all_cells_visited():
     return np.all(visited_grid)
 
+@check_button
 def turn_on_fan():
     GPIO.output(FAN_PIN, True)
 
