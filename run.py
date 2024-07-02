@@ -162,9 +162,6 @@ def turn_on_fan():
     GPIO.output(FAN_PIN, True)
 
 def main():
-    setup_gpio()
-    setup_pwm()
-
     try:            
         last_turn = 'right'
 
