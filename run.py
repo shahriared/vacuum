@@ -23,8 +23,7 @@ FAN_PIN = 40
 TOO_CLOSE_FRONT = 10.0
 
 # Time to turn 90 degrees (in seconds)
-TURNING_TIME = 3
-
+TURNING_TIME = 3.471
 # PWM frequency
 PWM_FREQ = 1000  # 1 kHz
 
@@ -88,7 +87,7 @@ def check_button(func):
     return wrapper
 
 @check_button
-def move_forward(speed=73):
+def move_forward(speed=80):
     #print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
