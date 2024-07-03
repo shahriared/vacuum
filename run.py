@@ -13,7 +13,7 @@ MOTOR_2_PIN_2 = 12
 ULTRASONIC_FRONT_TRIGGER = 5
 ULTRASONIC_FRONT_ECHO = 21
 
-LIMIT_SWITCH_PIN = 3
+LIMIT_SWITCH_PIN = 3.98
 
 TURN_ON_OFF_BUTTON_PIN = 7
 
@@ -57,7 +57,7 @@ def setup_gpio():
 
 def cleanup_gpio():
     GPIO.cleanup()
-    print("GPIO cleaned up")
+    #print("GPIO cleaned up")
 
 def setup_pwm():
     global pwm_motor_2_pin_1, pwm_motor_2_pin_2
@@ -65,7 +65,7 @@ def setup_pwm():
     pwm_motor_2_pin_2 = GPIO.PWM(MOTOR_2_PIN_2, PWM_FREQ)
     pwm_motor_2_pin_1.start(0)
     pwm_motor_2_pin_2.start(0)
-    print("PWM setup complete")
+    #print("PWM setup complete")
 
 def stop_motors_and_fan():
     GPIO.output(MOTOR_1_PIN_1, False)
@@ -73,7 +73,7 @@ def stop_motors_and_fan():
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
     GPIO.output(FAN_PIN, False)
-    print("Motors and fan stopped")
+    #print("Motors and fan stopped")
 
 def check_button(func):
     @wraps(func)
@@ -83,13 +83,13 @@ def check_button(func):
             return func(*args, **kwargs)
         else:
             stop_motors_and_fan()
-            print("Button not pressed, action halted.")
+            #print("Button not pressed, action halted.")
             return None
     return wrapper
 
 @check_button
 def move_forward(speed=73):
-    print("Moving forward")
+    #print("Moving forward")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
@@ -97,7 +97,7 @@ def move_forward(speed=73):
 
 @check_button
 def move_backward(speed=73):
-    print("Moving backward")
+    #print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -105,7 +105,7 @@ def move_backward(speed=73):
 
 @check_button
 def turn_left(speed=73):
-    print("Turning left")
+    #print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
     pwm_motor_2_pin_1.ChangeDutyCycle(speed)
@@ -113,7 +113,7 @@ def turn_left(speed=73):
 
 @check_button
 def turn_right(speed=73):
-    print("Turning right")
+    #print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -121,7 +121,7 @@ def turn_right(speed=73):
 
 @check_button
 def stop_motors():
-    print("Stopping motors")
+    #print("Stopping motors")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, False)
     pwm_motor_2_pin_1.ChangeDutyCycle(0)
@@ -212,13 +212,13 @@ def check_button_and_run():
     try:
         while True:
             button_state = GPIO.input(TURN_ON_OFF_BUTTON_PIN)
-            print(f"Button state: {button_state}")  # Debug statement
+            #print(f"Button state: {button_state}")  # Debug statement
             if button_state == 0:
-                print("Button pressed, starting main loop.")
+                #print("Button pressed, starting main loop.")
                 main()
             else:
                 stop_motors_and_fan()
-                print("Button not pressed, waiting.")
+                #print("Button not pressed, waiting.")
             time.sleep(1)  # Check button state every second
     except KeyboardInterrupt:
         cleanup_gpio()
