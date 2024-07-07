@@ -95,7 +95,7 @@ def move_forward(speed=80):
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 @check_button
-def move_backward(speed=73):
+def move_backward(speed=80):
     #print("Moving backward")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
@@ -103,7 +103,7 @@ def move_backward(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(speed)
 
 @check_button
-def turn_left(speed=73):
+def turn_left(speed=80):
     #print("Turning left")
     GPIO.output(MOTOR_1_PIN_1, False)
     GPIO.output(MOTOR_1_PIN_2, True)
@@ -111,7 +111,7 @@ def turn_left(speed=73):
     pwm_motor_2_pin_2.ChangeDutyCycle(0)
 
 @check_button
-def turn_right(speed=73):
+def turn_right(speed=80):
     #print("Turning right")
     GPIO.output(MOTOR_1_PIN_1, True)
     GPIO.output(MOTOR_1_PIN_2, False)
